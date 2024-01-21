@@ -32,10 +32,10 @@ export class CreateUserDto {
 	lastName?: string
 
 	@IsNumber()
-	lastOnline: number
+	lastOnline?: number
 
 	@IsBoolean()
-	isActivated: boolean
+	isActivated?: boolean
 
 	@IsString()
 	@IsNotEmpty()

@@ -3,6 +3,7 @@ import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
 	Body,
 	Controller,
+	Get,
 	HttpException,
 	HttpStatus,
 	Patch,
@@ -24,6 +25,17 @@ export class UserController {
 		try {
 			const updatedUser = await this.userService.update(userId, updateUserDto)
 			return { success: !!updatedUser.modifiedCount }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('online')
+	async updateLastOnline(@GetUserIdByToken() userId: string) {
+		try {
+			await this.userService.updateLastOnline(userId)
+			return { success: true }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

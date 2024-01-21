@@ -46,7 +46,19 @@ export class UserService {
 		return await this.userModel.findById({ _id: id })
 	}
 
+	async findByUserName(userName: string) {
+		return await this.userModel.findOne({ userName })
+	}
+
 	async remove(id: string) {
 		return await this.userModel.deleteOne({ _id: id })
+	}
+
+	async updateLastOnline(userId: string) {
+		const foundUser = await this.findById(userId)
+
+		foundUser.lastOnline = Date.now()
+
+		await foundUser.save()
 	}
 }

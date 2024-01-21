@@ -26,10 +26,10 @@ export class User {
 	@Prop({ type: String })
 	lastName?: string
 
-	@Prop({ required: true, type: Number })
-	lastOnline: number
+	@Prop({ type: Number })
+	lastOnline?: number
 
-	@Prop({ required: true, default: false, type: Boolean })
+	@Prop({ default: false, type: Boolean })
 	isActivated: boolean
 
 	@Prop({ required: true, unique: true, type: String })
