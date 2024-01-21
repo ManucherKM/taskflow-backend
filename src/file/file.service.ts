@@ -40,19 +40,11 @@ export class FileService {
 	}
 
 	async getAvatars() {
-		const avatars = [] as string[]
 		const pathToDir = join('uploads', 'avatar')
 
-		fs.readdir(pathToDir, (err, files) => {
-			if (err) {
-				console.log(err)
-				return
-			}
-
-			files.forEach(file => {
-				avatars.push(`${process.env.API_URL}/uploads/avatar/${file}`)
-			})
-		})
+		const avatars = fs
+			.readdirSync(pathToDir)
+			.map(file => `${process.env.API_URL}/uploads/avatar/${file}`)
 
 		return avatars
 	}
