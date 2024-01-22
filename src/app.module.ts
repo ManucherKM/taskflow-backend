@@ -5,8 +5,11 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { ActivationModule } from './activation/activation.module'
 import { AppController } from './app.controller'
 import { AuthModule } from './auth/auth.module'
+import { BoardModule } from './board/board.module'
 import { FileModule } from './file/file.module'
 import { JwtModule } from './jwt/jwt.module'
+import { StageModule } from './stage/stage.module'
+import { TaskModule } from './task/task.module'
 import { UserModule } from './user/user.module'
 
 @Module({
@@ -27,6 +30,9 @@ import { UserModule } from './user/user.module'
 		FileModule,
 		AuthModule,
 		ActivationModule,
+		BoardModule,
+		StageModule,
+		TaskModule,
 	],
 	controllers: [AppController],
 })
