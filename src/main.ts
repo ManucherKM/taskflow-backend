@@ -13,13 +13,13 @@ async function bootstrap() {
 		new ValidationPipe({
 			whitelist: true,
 		}),
-	)
+	)	
 
 	app.setGlobalPrefix('api')
 
 	app.use('/uploads', express.static(join(__dirname, '..', 'uploads')))
 
-	app.enableCors({ origin: '*' })
+	app.enableCors({ credentials:true, origin: true })
 
 	await app.listen(PORT)
 }

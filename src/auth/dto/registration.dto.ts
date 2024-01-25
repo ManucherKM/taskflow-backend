@@ -1,8 +1,14 @@
-import { IsEmail, IsNotEmpty, IsString, IsUrl, Matches } from 'class-validator'
-
-const passwordRegex = new RegExp(
-	'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_])(?=.{8,32}$)',
-)
+import {
+	IsDefined,
+	IsEmail,
+	IsNotEmpty,
+	IsOptional,
+	IsString,
+	IsUrl,
+	Matches,
+	MaxLength,
+	MinLength,
+} from 'class-validator'
 
 export class RegistrationDto {
 	@IsEmail()
@@ -12,10 +18,13 @@ export class RegistrationDto {
 	@IsNotEmpty()
 	userName: string
 
-	@Matches(passwordRegex)
+	@IsString()
+	@MinLength(8)
+	@MaxLength(32)
 	password: string
 
-	@IsUrl()
+	@IsOptional()
+	@IsString()
 	avatar?: string
 
 	@IsString()
