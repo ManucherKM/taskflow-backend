@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common'
 import { Response } from 'express'
 import { AuthService } from './auth.service'
-import { LoginDto } from './dto/login.dto'
+import { LoginWithEmailDto } from './dto/loginWithEmail.dto'
+import { LoginWithUserNameDto } from './dto/loginWithUserName.dto'
 import { RegistrationDto } from './dto/registration.dto'
 
 @Controller('auth')
@@ -25,15 +26,31 @@ export class AuthController {
 		}
 	}
 
-	@Post('login')
-	async login(
-		@Body() loginDto: LoginDto,
+	@Post('login/email')
+	async loginWithEmail(
+		@Body() loginWithEmailDto: LoginWithEmailDto,
 		@Res({ passthrough: true }) res: Response,
 	) {
 		try {
-			const { accessToken, refreshToken } = await this.authService.login(
-				loginDto,
-			)
+			const { accessToken, refreshToken } =
+				await this.authService.loginWithEmail(loginWithEmailDto)
+
+			res.cookie('refreshToken', refreshToken, { httpOnly: true })
+
+			return { accessToken }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@Post('login/username')
+	async loginWithUserName(
+		@Body() loginWithUserNameDto: LoginWithUserNameDto,
+		@Res({ passthrough: true }) res: Response,
+	) {
+		try {
+			const { accessToken, refreshToken } =
+				await this.authService.loginWithUserName(loginWithUserNameDto)
 
 			res.cookie('refreshToken', refreshToken, { httpOnly: true })
 

@@ -6,7 +6,8 @@ import { MailerService } from '@nestjs-modules/mailer'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { compare } from 'bcrypt'
 import { v4 } from 'uuid'
-import { LoginDto } from './dto/login.dto'
+import { LoginWithEmailDto } from './dto/loginWithEmail.dto'
+import { LoginWithUserNameDto } from './dto/loginWithUserName.dto'
 import { RegistrationDto } from './dto/registration.dto'
 
 @Injectable()
@@ -52,8 +53,38 @@ export class AuthService {
 		return { success: true }
 	}
 
-	async login(loginDto: LoginDto) {
+	async loginWithEmail(loginDto: LoginWithEmailDto) {
 		const foundUser = await this.userService.findByEmail(loginDto.email)
+
+		if (!foundUser || !foundUser.isActivated) {
+			throw new BadRequestException('Incorrect login or password.')
+		}
+
+		const isCorrectPassword = await compare(
+			loginDto.password,
+			foundUser.password,
+		)
+
+		if (!isCorrectPassword) {
+			throw new BadRequestException('Incorrect login or password.')
+		}
+
+		const userId = foundUser._id.toString()
+
+		const payload = { userId }
+
+		const refreshToken = await this.jwtService.generateRefreshToken(payload)
+
+		const accessToken = this.jwtService.getAccessToken(payload)
+
+		return {
+			refreshToken,
+			accessToken,
+		}
+	}
+
+	async loginWithUserName(loginDto: LoginWithUserNameDto) {
+		const foundUser = await this.userService.findByUserName(loginDto.userName)
 
 		if (!foundUser || !foundUser.isActivated) {
 			throw new BadRequestException('Incorrect login or password.')
