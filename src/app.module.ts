@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module'
 import { BoardModule } from './board/board.module'
 import { FileModule } from './file/file.module'
 import { JwtModule } from './jwt/jwt.module'
+import { OtpModule } from './otp/otp.module'
+import { RestoreAccountModule } from './restore-account/restore-account.module'
 import { StageModule } from './stage/stage.module'
 import { TaskModule } from './task/task.module'
 import { UserModule } from './user/user.module'
@@ -33,6 +35,8 @@ import { UserModule } from './user/user.module'
 		BoardModule,
 		StageModule,
 		TaskModule,
+		OtpModule,
+		RestoreAccountModule,
 	],
 	controllers: [AppController],
 })

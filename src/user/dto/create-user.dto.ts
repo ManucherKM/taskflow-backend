@@ -5,11 +5,9 @@ import {
 	IsNumber,
 	IsString,
 	Matches,
+	MaxLength,
+	MinLength,
 } from 'class-validator'
-
-const passwordRegex = new RegExp(
-	'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_])(?=.{832}$)',
-)
 
 export class CreateUserDto {
 	@IsEmail()
@@ -19,7 +17,9 @@ export class CreateUserDto {
 	@IsNotEmpty()
 	userName: string
 
-	@Matches(passwordRegex)
+	@IsString()
+	@MinLength(8)
+	@MaxLength(32)
 	password: string
 
 	@IsString()
