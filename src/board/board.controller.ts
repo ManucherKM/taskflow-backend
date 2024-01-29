@@ -47,6 +47,19 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@Post('name')
+	async findByName(
+		@GetUserIdByToken() userId: string,
+		@Body() { name }: { name: string },
+	) {
+		try {
+			return await this.boardService.findByName(userId, name)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
 	@Patch(':id')
 	async update(
 		@Param('id') id: string,

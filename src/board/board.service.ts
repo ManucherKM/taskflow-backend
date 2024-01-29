@@ -44,6 +44,13 @@ export class BoardService {
 		return deepFound
 	}
 
+	async findByName(userId: string, name: string) {
+		return await this.boardModel.find({
+			users: userId,
+			name: new RegExp(name),
+		})
+	}
+
 	async update(id: string, updateBoardDto: UpdateBoardDto) {
 		return await this.boardModel.updateOne({ _id: id }, updateBoardDto)
 	}
