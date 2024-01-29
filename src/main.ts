@@ -1,7 +1,9 @@
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import cookieParser from 'cookie-parser'
 import * as express from 'express'
 import { join } from 'path'
+
 import { AppModule } from './app.module'
 
 const PORT = process.env.PORT || 5000
@@ -16,6 +18,8 @@ async function bootstrap() {
 	)
 
 	app.setGlobalPrefix('api')
+
+	app.use(cookieParser())
 
 	app.use('/uploads', express.static(join(__dirname, '..', 'uploads')))
 
