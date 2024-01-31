@@ -17,14 +17,32 @@ export class User {
 	@Prop({ required: true, type: String })
 	password: string
 
-	@Prop({ default: getRandomImg(), type: String })
-	avatar: string
+	@Prop({ type: String })
+	avatar?: string
 
 	@Prop({ type: String })
 	firstName?: string
 
 	@Prop({ type: String })
 	lastName?: string
+
+	@Prop({ type: String })
+	bio?: string
+
+	@Prop({ type: String })
+	birthday?: string
+
+	@Prop({ type: String, default: 'ru' })
+	language: string
+
+	@Prop({ type: String, default: 'dark' })
+	mode: string
+
+	@Prop({ type: String, default: 'sans' })
+	font: string
+
+	@Prop({ type: [{ value: String }] })
+	urls?: { value: string }[]
 
 	@Prop({ type: Number })
 	lastOnline?: number

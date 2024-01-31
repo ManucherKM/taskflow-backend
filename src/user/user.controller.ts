@@ -40,4 +40,24 @@ export class UserController {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
 	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get()
+	async findById(@GetUserIdByToken() userId: string) {
+		try {
+			const {
+				password,
+				activationKey,
+				isActivated,
+				lastOnline,
+				__v,
+				updatedAt,
+				createdAt,
+				...other
+			} = ((await this.userService.findById(userId)) as any).toObject()
+			return other
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
 }

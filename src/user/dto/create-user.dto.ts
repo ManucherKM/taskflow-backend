@@ -1,13 +1,23 @@
+import { Type } from 'class-transformer'
 import {
+	IsArray,
 	IsBoolean,
 	IsEmail,
 	IsNotEmpty,
 	IsNumber,
+	IsOptional,
 	IsString,
 	Matches,
 	MaxLength,
 	MinLength,
+	ValidateNested,
 } from 'class-validator'
+
+class Url {
+	@IsString()
+	@IsNotEmpty()
+	value: string
+}
 
 export class CreateUserDto {
 	@IsEmail()
@@ -39,5 +49,31 @@ export class CreateUserDto {
 
 	@IsString()
 	@IsNotEmpty()
-	activationKey: string
+	activationKey?: string
+
+	@IsOptional()
+	@IsString()
+	bio?: string
+
+	@IsOptional()
+	@IsString()
+	birthday?: string
+
+	@IsOptional()
+	@IsString()
+	language?: string
+
+	@IsOptional()
+	@IsString()
+	mode?: string
+
+	@IsOptional()
+	@IsString()
+	font?: string
+
+	@IsOptional()
+	@IsArray()
+	@ValidateNested({ each: true })
+	@Type(() => Url)
+	urls?: { value: string }[]
 }
