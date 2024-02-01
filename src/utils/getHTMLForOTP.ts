@@ -1,3 +1,55 @@
 export function getHTMLForOTP(otp: number | string) {
-	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head> <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Verify your login</title> <!--[if mso]><style type="text/css">body,table,td,a{font-family:Arial,Helvetica,sans-serif!important}</style><![endif]--></head><body style="font-family:Helvetica,Arial,sans-serif;margin:0;padding:0;background-color:#09090b"> <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-family:Arial,Helvetica,sans-serif;background-color:#09090b"> <tbody> <tr> <td align="center" style="padding:1rem 2rem;vertical-align:top;width:100%"> <table role="presentation" style="max-width:600px;border-collapse:collapse;border:0;border-spacing:0;text-align:left"> <tbody> <tr> <td style="padding:40px 0 0"> <div style="text-align:center"> <div style="padding-bottom:20px"> <svg width="103.9" height="20" viewBox="0 0 1000 194" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_38_51)"> <g clip-path="url(#clip1_38_51)"> <g clip-path="url(#clip2_38_51)"> <g clip-path="url(#clip3_38_51)"> <g clip-path="url(#clip4_38_51)"> <g clip-path="url(#clip5_38_51)"> <g clip-path="url(#clip6_38_51)"> <path d="M89.4668 32.964V46.9534H53.6067V165.765H37.647V46.9534H1.78695V32.964H89.4668ZM138.134 153.745C145.227 153.745 150.876 151.736 155.079 147.716C159.282 143.723 161.384 138.64 161.384 132.466V119.659H144.045C135.638 119.659 129.333 121.301 125.13 124.585C120.927 127.868 118.825 132.006 118.825 136.998C118.825 141.989 120.467 146.022 123.751 149.096C127.035 152.196 131.829 153.745 138.134 153.745ZM161.581 165.765V153.943C156.458 162.481 147.132 166.75 133.602 166.75C124.276 166.75 116.749 163.991 111.022 158.474C105.321 152.957 102.471 145.996 102.471 137.589C102.471 128 106.11 120.539 113.387 115.206C120.69 109.899 130.647 107.246 143.257 107.246H161.384V102.123C161.384 94.2414 159.611 88.291 156.064 84.2715C152.518 80.2783 146.541 78.2817 138.134 78.2817C127.494 78.2817 118.037 81.1058 109.761 86.7541V71.1885C117.249 66.591 127.1 64.2923 139.316 64.2923C164.405 64.2923 176.95 77.0338 176.95 102.517V165.765H161.581ZM264.63 139.165C264.63 147.703 261.635 154.468 255.645 159.459C249.681 164.451 241.511 166.947 231.134 166.947C219.049 166.947 209.263 164.911 201.776 160.839V145.667C210.577 150.921 220.034 153.548 230.149 153.548C236.191 153.548 240.788 152.366 243.941 150.002C247.094 147.637 248.67 144.419 248.67 140.347C248.67 135.618 246.923 131.94 243.429 129.313C239.961 126.686 234.155 123.731 226.011 120.447C218.524 117.557 212.508 113.945 207.963 109.61C203.444 105.275 201.185 99.4299 201.185 92.074C201.185 83.7986 204.298 77.1914 210.524 72.2525C216.777 67.3398 224.566 64.8834 233.892 64.8834C244.269 64.8834 252.611 66.3283 258.916 69.2182V83.9957C252.873 80.3177 244.598 78.4787 234.089 78.4787C228.835 78.4787 224.658 79.6872 221.558 82.1041C218.484 84.5474 216.947 87.6736 216.947 91.4829C216.947 93.8473 217.407 95.9096 218.327 97.6698C219.246 99.4562 221.046 101.203 223.725 102.911C226.431 104.618 228.402 105.761 229.636 106.339C230.897 106.943 233.63 108.165 237.833 110.004C246.24 113.419 252.808 117.294 257.536 121.629C262.265 125.964 264.63 131.809 264.63 139.165ZM301.041 27.25V165.765H285.673V27.25H301.041ZM360.742 65.8686L321.336 113.354L361.925 165.765H343.206L303.012 113.354L342.221 65.8686H360.742ZM447.043 94.0444V108.034H396.997V165.765H381.037V32.964H453.939V46.9534H396.997V94.0444H447.043ZM492.952 26.4619V165.765H477.386V26.4619H492.952ZM610.384 116.112C610.384 130.955 606.18 143.237 597.774 152.957C589.367 162.678 577.808 167.538 563.096 167.538C548.778 167.538 537.442 162.704 529.088 153.036C520.76 143.395 516.596 131.218 516.596 116.506C516.596 101.663 520.891 89.2762 529.482 79.3457C538.099 69.4415 549.303 64.4894 563.096 64.4894C578.202 64.4894 589.853 69.3495 598.05 79.0698C606.272 88.7901 610.384 101.138 610.384 116.112ZM532.753 116.309C532.753 126.686 535.511 135.513 541.028 142.79C546.545 150.094 553.901 153.745 563.096 153.745C573.079 153.745 580.763 150.159 586.149 142.987C591.534 135.842 594.227 126.949 594.227 116.309C594.227 105.275 591.666 96.1723 586.543 89.0003C581.42 81.8546 573.604 78.2817 563.096 78.2817C553.638 78.2817 546.217 81.9597 540.831 89.3156C535.445 96.6715 532.753 105.669 532.753 116.309ZM682.656 133.057L673.592 165.765H654.48L623.743 65.8686H640.293L649.948 98.9702C653.363 110.529 656.227 120.604 658.539 129.195C660.824 137.812 662.296 143.565 662.952 146.455L663.937 150.593C665.908 142.186 670.702 124.913 678.321 98.7732L687.779 65.8686H704.329L713.984 98.7732L728.762 150.79C730.601 143.04 735.658 125.701 743.933 98.7732L753.982 65.8686H769.942L738.416 165.765H719.304L709.846 133.057L696.054 83.2075C694.084 91.6143 689.618 108.231 682.656 133.057Z" fill="white" /> </g> </g> </g> </g> <g clip-path="url(#clip7_38_51)"> <path d="M856.576 -0.483398H803.286V194.484H856.576V-0.483398Z" fill="white" /> <path d="M921.566 -0.483398H868.275V194.484H921.566V-0.483398Z" fill="white" fill-opacity="0.75" /> <path d="M986.555 -0.483398H933.264V194.484H986.555V-0.483398Z" fill="white" fill-opacity="0.5" /> </g> </g> </g> </g> <defs> <clip-path id="clip0_38_51"> <rect width="1000" height="194" fill="white" /> </clip-path> <clip-path id="clip1_38_51"> <rect width="996.505" height="194.967" fill="white" transform="translate(1.74753 -0.483398)" /> </clip-path> <clip-path id="clip2_38_51"> <rect width="996.505" height="194.967" fill="white" transform="translate(1.74753 -0.483398)" /> </clip-path> <clip-path id="clip3_38_51"> <rect width="768.233" height="141.076" fill="white" transform="translate(1.74754 26.4619)" /> </clip-path> <clip-path id="clip4_38_51"> <rect width="768.233" height="141.076" fill="white" transform="translate(1.74754 26.4619)" /> </clip-path> <clip-path id="clip5_38_51"> <rect width="768.233" height="141.076" fill="white" transform="translate(1.74754 26.4619)" /> </clip-path> <clip-path id="clip6_38_51"> <rect width="768.233" height="141.076" fill="white" transform="translate(1.74754 26.4619)" /> </clip-path> <clip-path id="clip7_38_51"> <rect width="194.967" height="194.967" fill="white" transform="translate(803.286 -0.483398)" /> </clip-path> </defs> </svg> </div> </div> <div style="padding:20px;border:1px solid #27272a;border-radius:12px"> <div style="color:#a1a1aa;text-align:left"> <h1 style="margin:1rem 0;color:#fafafa">Verification code</h1> <p style="padding-bottom:16px">Please use the verification code below to sign in.</p> <p style="padding-bottom:16px"><strong style="font-size:130%;color:#fafafa">${otp}</strong></p> <p style="padding-bottom:16px">If you didn’t request this, you can ignore this email.</p> <p style="padding-bottom:16px">Best regards, TaskFlow team.</p> </div> </div> <div style="padding-top:20px;color:#737373;text-align:center"> <p style="padding-bottom:16px">Made with TaskFlow</p> </div> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table></body></html>`
+	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+	<html xmlns="http://www.w3.org/1999/xhtml">
+	
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Verify your login</title>
+		<!--[if mso]><style type="text/css">body,table,td,a{font-family:Arial,Helvetica,sans-serif!important}</style><![endif]-->
+	</head>
+	
+	<body style="font-family:Helvetica,Arial,sans-serif;margin:0;padding:0;background-color:#09090b">
+		<table role="presentation"
+			style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-family:Arial,Helvetica,sans-serif;background-color:#09090b">
+			<tbody>
+				<tr>
+					<td align="center" style="padding:1rem 2rem;vertical-align:top;width:100%">
+						<table role="presentation"
+							style="max-width:600px;border-collapse:collapse;border:0;border-spacing:0;text-align:left">
+							<tbody>
+								<tr>
+									<td style="padding:40px 0 0">
+										<div style="text-align:center">
+											<div style="padding-bottom:20px">
+												<img src="https://raw.githubusercontent.com/ManucherKM/taskflow-frontend/2960b6d64c065f83aaeb02cbb237f19502ce4944/public/logo-wite.svg"
+													alt="TaskFlow logo">
+											</div>
+										</div>
+										<div style="padding:20px;border:1px solid #27272a;border-radius:12px">
+											<div style="color:#a1a1aa;text-align:left">
+												<h1 style="margin:1rem 0;color:#fafafa">Verification code</h1>
+												<p style="padding-bottom:16px">Please use the verification code below to
+													sign in.</p>
+												<p style="padding-bottom:16px"><strong
+														style="font-size:130%;color:#fafafa">${otp}</strong></p>
+												<p style="padding-bottom:16px">If you didn’t request this, you can ignore
+													this email.</p>
+												<p style="padding-bottom:16px">Best regards, TaskFlow team.</p>
+											</div>
+										</div>
+										<div style="padding-top:20px;color:#737373;text-align:center">
+											<p style="padding-bottom:16px">Made with TaskFlow</p>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+	
+	</html>`
 }
