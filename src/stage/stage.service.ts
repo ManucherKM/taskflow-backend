@@ -31,6 +31,10 @@ export class StageService {
 		return createdStage
 	}
 
+	async findById(id) {
+		return await this.stageModel.findById(id)
+	}
+
 	async update(id: string, updateStageDto: UpdateStageDto) {
 		return await this.stageModel.updateOne({ _id: id }, updateStageDto)
 	}

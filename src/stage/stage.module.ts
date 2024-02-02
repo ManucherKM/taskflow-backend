@@ -12,5 +12,6 @@ import { StageService } from './stage.service'
 	],
 	controllers: [StageController],
 	providers: [StageService],
+	exports: [StageService],
 })
 export class StageModule {}
