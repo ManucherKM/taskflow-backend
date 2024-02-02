@@ -53,12 +53,4 @@ export class UserService {
 	async remove(id: string) {
 		return await this.userModel.deleteOne({ _id: id })
 	}
-
-	async updateLastOnline(userId: string) {
-		const foundUser = await this.findById(userId)
-
-		foundUser.lastOnline = Date.now()
-
-		await foundUser.save()
-	}
 }

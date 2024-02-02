@@ -31,17 +31,6 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('online')
-	async updateLastOnline(@GetUserIdByToken() userId: string) {
-		try {
-			await this.userService.updateLastOnline(userId)
-			return { success: true }
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@UseGuards(JwtAuthGuard)
 	@Get()
 	async findById(@GetUserIdByToken() userId: string) {
 		try {
