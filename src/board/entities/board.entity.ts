@@ -1,6 +1,6 @@
 import { StageDocument } from '@/stage/entities/stage.entity'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, SchemaTypes } from 'mongoose'
+import { HydratedDocument, SchemaTypes, Types } from 'mongoose'
 
 export type BoardDocument = HydratedDocument<Board>
 
@@ -15,7 +15,7 @@ export class Board {
 	isFavorite: boolean
 
 	@Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Stage' }], default: [] })
-	stages: StageDocument[]
+	stages: StageDocument[] | Types.ObjectId[]
 
 	@Prop({ required: true, type: [{ type: SchemaTypes.ObjectId, ref: 'User' }] })
 	admins: string[]

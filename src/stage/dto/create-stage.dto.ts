@@ -4,4 +4,8 @@ export class CreateStageDto {
 	@IsString()
 	@IsNotEmpty()
 	name: string
+
+	@IsString()
+	@IsNotEmpty()
+	boardId: string
 }
