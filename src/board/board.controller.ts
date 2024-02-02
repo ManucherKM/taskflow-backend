@@ -4,7 +4,6 @@ import {
 	Body,
 	Controller,
 	Delete,
-	Get,
 	HttpException,
 	HttpStatus,
 	Param,
@@ -35,12 +34,9 @@ export class BoardController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post('all')
-	async findAllByUserId(
-		@GetUserIdByToken() userId: string,
-		@Body() { deep }: { deep: boolean },
-	) {
+	async findAllByUserId(@GetUserIdByToken() userId: string) {
 		try {
-			return await this.boardService.findAllByUserId(userId, deep)
+			return await this.boardService.findAllByUserId(userId)
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
@@ -83,6 +79,16 @@ export class BoardController {
 			return {
 				success: !!res.deletedCount,
 			}
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Post(':id')
+	async findDeepById(@Body() { id }: { id: string }) {
+		try {
+			return await this.boardService.findDeepById(id)
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

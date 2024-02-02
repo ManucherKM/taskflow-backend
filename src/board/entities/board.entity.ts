@@ -1,7 +1,6 @@
-import { Stage, StageDocument } from '@/stage/entities/stage.entity'
-import { User } from '@/user/entities/user.entity'
+import { StageDocument } from '@/stage/entities/stage.entity'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, Model, SchemaTypes, Types } from 'mongoose'
+import { HydratedDocument, SchemaTypes } from 'mongoose'
 
 export type BoardDocument = HydratedDocument<Board>
 

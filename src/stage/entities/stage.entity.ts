@@ -1,6 +1,6 @@
 import { TaskDocument } from '@/task/entities/task.entity'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, Model, SchemaTypes, Types } from 'mongoose'
+import { HydratedDocument, SchemaTypes } from 'mongoose'
 
 export type StageDocument = HydratedDocument<Stage>
 

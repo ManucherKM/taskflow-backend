@@ -1,11 +1,8 @@
 import {
-	IsDefined,
 	IsEmail,
 	IsNotEmpty,
 	IsOptional,
 	IsString,
-	IsUrl,
-	Matches,
 	MaxLength,
 	MinLength,
 } from 'class-validator'

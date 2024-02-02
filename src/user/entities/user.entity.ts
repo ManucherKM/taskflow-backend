@@ -1,4 +1,3 @@
-import { getRandomImg } from '@/utils/getRandomImg'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument } from 'mongoose'
 
@@ -32,20 +31,8 @@ export class User {
 	@Prop({ type: String })
 	birthday?: string
 
-	@Prop({ type: String, default: 'ru' })
-	language: string
-
-	@Prop({ type: String, default: 'dark' })
-	mode: string
-
-	@Prop({ type: String, default: 'sans' })
-	font: string
-
 	@Prop({ type: [{ value: String }] })
 	urls?: { value: string }[]
-
-	@Prop({ type: Number })
-	lastOnline?: number
 
 	@Prop({ default: false, type: Boolean })
 	isActivated: boolean

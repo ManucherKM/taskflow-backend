@@ -4,10 +4,8 @@ import {
 	IsBoolean,
 	IsEmail,
 	IsNotEmpty,
-	IsNumber,
 	IsOptional,
 	IsString,
-	Matches,
 	MaxLength,
 	MinLength,
 	ValidateNested,
@@ -41,9 +39,6 @@ export class CreateUserDto {
 	@IsString()
 	lastName?: string
 
-	@IsNumber()
-	lastOnline?: number
-
 	@IsBoolean()
 	isActivated?: boolean
 
@@ -58,18 +53,6 @@ export class CreateUserDto {
 	@IsOptional()
 	@IsString()
 	birthday?: string
-
-	@IsOptional()
-	@IsString()
-	language?: string
-
-	@IsOptional()
-	@IsString()
-	mode?: string
-
-	@IsOptional()
-	@IsString()
-	font?: string
 
 	@IsOptional()
 	@IsArray()

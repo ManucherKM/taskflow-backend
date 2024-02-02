@@ -21,25 +21,25 @@ export class BoardService {
 		return createdBoard
 	}
 
-	async findAllByUserId(userId: string, deep: boolean) {
-		const foundBoards = await this.boardModel.find({
+	async findAllByUserId(userId: string) {
+		return await this.boardModel.find({
 			users: userId,
 		})
+	}
 
-		if (!deep) {
-			return foundBoards
-		}
+	async findById(id: string) {
+		return await this.boardModel.findById(id)
+	}
 
-		const deepFound = await Promise.all(
-			foundBoards.map(async board => {
-				return board.populate({
-					path: 'stages',
-					populate: {
-						path: 'tasks',
-					},
-				})
-			}),
-		)
+	async findDeepById(id: string) {
+		const foundBoard = await this.findById(id)
+
+		const deepFound = await foundBoard.populate({
+			path: 'stages',
+			populate: {
+				path: 'tasks',
+			},
+		})
 
 		return deepFound
 	}
