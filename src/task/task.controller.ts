@@ -42,6 +42,16 @@ export class TaskController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@Post('/duplicate')
+	async duplicate(@Body() duplicateTaskDto: { id: string }) {
+		try {
+			return await this.taskService.duplicate(duplicateTaskDto.id)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
 	@Delete(':id')
 	async remove(@Param('id') id: string) {
 		try {

@@ -54,6 +54,10 @@ export class StageService {
 		return await foundStage.populate('tasks')
 	}
 
+	async findByTaskId(taskId) {
+		return await this.stageModel.findOne({ tasks: taskId })
+	}
+
 	async duplicate(id: string) {
 		const foundStage = await this.findById(id)
 

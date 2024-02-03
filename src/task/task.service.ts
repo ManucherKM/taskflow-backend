@@ -1,7 +1,7 @@
 import { StageService } from '@/stage/stage.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 import { CreateTaskDto } from './dto/create-task.dto'
 import { UpdateTaskDto } from './dto/update-task.dto'
 import { Task } from './entities/task.entity'
@@ -38,5 +38,31 @@ export class TaskService {
 
 	async remove(id: string) {
 		return await this.taskModel.deleteOne({ _id: id })
+	}
+
+	async findById(id: string | Types.ObjectId) {
+		return await this.taskModel.findById(id)
+	}
+
+	async duplicate(id: string) {
+		const foundTask = await this.findById(id)
+
+		if (!foundTask) {
+			throw new BadRequestException('Task not found')
+		}
+
+		const foundStage = await this.stageService.findByTaskId(id)
+
+		if (!foundStage) {
+			throw new BadRequestException('Stage not found')
+		}
+
+		const createdTask = await this.create({
+			stageId: foundStage._id as unknown as string,
+			description: foundTask.description,
+			title: foundTask.title,
+		})
+
+		return createdTask
 	}
 }
