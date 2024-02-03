@@ -42,4 +42,26 @@ export class StageService {
 	async remove(id: string) {
 		return await this.stageModel.deleteOne({ _id: id })
 	}
+
+	async duplicate(id: string) {
+		const foundStage = await this.findById(id)
+
+		if (!foundStage) {
+			throw new BadRequestException('Stage not found')
+		}
+
+		const foundBoard = await this.boardService.findByStageId(id)
+
+		if (!foundBoard) {
+			throw new BadRequestException('Board not found')
+		}
+
+		const createdStage = await this.create({
+			boardId: foundBoard._id as unknown as string,
+			name: foundStage.name,
+			tasks: foundStage.tasks as unknown[] as string[],
+		})
+
+		return createdStage
+	}
 }

@@ -44,6 +44,10 @@ export class BoardService {
 		return deepFound
 	}
 
+	async findByStageId(stageId: string) {
+		return await this.boardModel.findOne({ stages: stageId })
+	}
+
 	async findByName(userId: string, name: string) {
 		return await this.boardModel.find({
 			users: userId,
