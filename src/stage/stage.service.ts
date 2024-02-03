@@ -1,7 +1,7 @@
 import { BoardService } from '@/board/board.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 import { CreateStageDto } from './dto/create-stage.dto'
 import { UpdateStageDto } from './dto/update-stage.dto'
 import { Stage } from './entities/stage.entity'
@@ -22,6 +22,7 @@ export class StageService {
 
 		const createdStage = await this.stageModel.create({
 			name: createStageDto.name,
+			tasks: createStageDto.tasks,
 		})
 
 		foundBoard.stages[foundBoard.stages.length] = createdStage._id
@@ -43,6 +44,16 @@ export class StageService {
 		return await this.stageModel.deleteOne({ _id: id })
 	}
 
+	async getDeepInfo(id: string | Types.ObjectId) {
+		const foundStage = await this.findById(id)
+
+		if (!foundStage) {
+			throw new BadRequestException('Stage not found')
+		}
+
+		return await foundStage.populate('tasks')
+	}
+
 	async duplicate(id: string) {
 		const foundStage = await this.findById(id)
 
@@ -62,6 +73,6 @@ export class StageService {
 			tasks: foundStage.tasks as unknown[] as string[],
 		})
 
-		return createdStage
+		return await this.getDeepInfo(createdStage._id)
 	}
 }
