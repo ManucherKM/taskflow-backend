@@ -1,5 +1,10 @@
 import { StageService } from '@/stage/stage.service'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+	BadRequestException,
+	forwardRef,
+	Inject,
+	Injectable,
+} from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
 import { CreateTaskDto } from './dto/create-task.dto'
@@ -10,6 +15,7 @@ import { Task } from './entities/task.entity'
 export class TaskService {
 	constructor(
 		@InjectModel(Task.name) private readonly taskModel: Model<Task>,
+		@Inject(forwardRef(() => StageService))
 		private readonly stageService: StageService,
 	) {}
 
@@ -44,7 +50,7 @@ export class TaskService {
 		return await this.taskModel.findById(id)
 	}
 
-	async duplicate(id: string) {
+	async duplicate(id: string | Types.ObjectId) {
 		const foundTask = await this.findById(id)
 
 		if (!foundTask) {

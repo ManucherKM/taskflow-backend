@@ -1,5 +1,12 @@
 import { BoardService } from '@/board/board.service'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { TaskDocument } from '@/task/entities/task.entity'
+import { TaskService } from '@/task/task.service'
+import {
+	BadRequestException,
+	forwardRef,
+	Inject,
+	Injectable,
+} from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
 import { CreateStageDto } from './dto/create-stage.dto'
@@ -11,6 +18,8 @@ export class StageService {
 	constructor(
 		@InjectModel(Stage.name) private readonly stageModel: Model<Stage>,
 		private readonly boardService: BoardService,
+		@Inject(forwardRef(() => TaskService))
+		private readonly taskService: TaskService,
 	) {}
 
 	async create(createStageDto: CreateStageDto) {
@@ -71,10 +80,22 @@ export class StageService {
 			throw new BadRequestException('Board not found')
 		}
 
+		const promiseTasks: Promise<TaskDocument>[] = []
+
+		if (foundStage.tasks.length !== 0) {
+			for (const task of foundStage.tasks) {
+				promiseTasks[promiseTasks.length] = this.taskService.duplicate(task._id)
+			}
+		}
+
+		const copyTasks = await Promise.all(promiseTasks)
+
+		const ids = copyTasks.map(task => task._id)
+
 		const createdStage = await this.create({
 			boardId: foundBoard._id as unknown as string,
 			name: foundStage.name,
-			tasks: foundStage.tasks as unknown[] as string[],
+			tasks: ids as unknown[] as string[],
 		})
 
 		return await this.getDeepInfo(createdStage._id)

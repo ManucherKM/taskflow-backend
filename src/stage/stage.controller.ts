@@ -46,6 +46,16 @@ export class StageController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@Post('/duplicate')
+	async duplicate(@Body() duplicateStageDto: { id: string }) {
+		try {
+			return await this.stageService.duplicate(duplicateStageDto.id)
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
 	@Delete(':id')
 	async remove(@Param('id') id: string) {
 		try {
