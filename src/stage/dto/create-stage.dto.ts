@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { Types } from 'mongoose'
 
 export class CreateStageDto {
 	@IsString()
@@ -7,7 +8,7 @@ export class CreateStageDto {
 
 	@IsString()
 	@IsNotEmpty()
-	boardId: string
+	boardId: string | Types.ObjectId
 
 	@IsOptional()
 	@IsString()

@@ -1,10 +1,11 @@
+import { BoardService } from '@/board/board.service'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Delete,
-	HttpException,
-	HttpStatus,
+	InternalServerErrorException,
 	Param,
 	Patch,
 	Post,
@@ -16,15 +17,32 @@ import { StageService } from './stage.service'
 
 @Controller('stage')
 export class StageController {
-	constructor(private readonly stageService: StageService) {}
+	constructor(
+		private readonly stageService: StageService,
+		private readonly boardService: BoardService,
+	) {}
 
 	@UseGuards(JwtAuthGuard)
 	@Post()
 	async create(@Body() createStageDto: CreateStageDto) {
 		try {
-			return await this.stageService.create(createStageDto)
+			const foundBoard = await this.boardService.findById(
+				createStageDto.boardId,
+			)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			const createdStage = await this.stageService.create(createStageDto)
+
+			foundBoard.stages[foundBoard.stages.length] = createdStage._id
+
+			await foundBoard.save()
+
+			return createdStage
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -35,9 +53,21 @@ export class StageController {
 		@Body() updateStageDto: UpdateStageDto,
 	) {
 		try {
-			return await this.stageService.update(id, updateStageDto)
+			const updateResult = await this.stageService.update(id, updateStageDto)
+
+			if (!!updateResult.modifiedCount) {
+				throw new BadRequestException('Failed to update the Stage.')
+			}
+
+			const foundStage = await this.stageService.getDeepInfo(id)
+
+			if (!foundStage) {
+				throw new BadRequestException('Stage not found')
+			}
+
+			return updateResult
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -45,9 +75,17 @@ export class StageController {
 	@Post('/duplicate')
 	async duplicate(@Body() duplicateStageDto: { id: string }) {
 		try {
-			return await this.stageService.duplicate(duplicateStageDto.id)
+			const duplicatedStage = await this.stageService.duplicate(
+				duplicateStageDto.id,
+			)
+
+			if (!duplicatedStage) {
+				throw new BadRequestException('Failed to duplicate stage.')
+			}
+
+			return duplicatedStage
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -55,13 +93,13 @@ export class StageController {
 	@Delete(':id')
 	async remove(@Param('id') id: string) {
 		try {
-			const res = await this.stageService.remove(id)
+			const deleteResult = await this.stageService.remove(id)
 
 			return {
-				success: !!res.deletedCount,
+				success: !!deleteResult.deletedCount,
 			}
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 }

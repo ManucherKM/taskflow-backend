@@ -1,5 +1,5 @@
 import { getHash } from '@/utils/getHash'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -11,13 +11,9 @@ export class UserService {
 	constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
 	async create(createUserDto: CreateUserDto) {
-		const foundUser = await this.findByEmail(createUserDto.email)
+		const createdUser = await this.userModel.create(createUserDto)
 
-		if (foundUser) {
-			throw new BadRequestException('This user already exists')
-		}
-
-		return await this.userModel.create(createUserDto)
+		return createdUser
 	}
 
 	async update(userId: string, updateUserDto: UpdateUserDto) {
@@ -25,32 +21,50 @@ export class UserService {
 
 		if (password) {
 			const passwordHash = await getHash(password)
-			return await this.userModel.updateOne(
+
+			const updateResult = await this.userModel.updateOne(
 				{ _id: userId },
 				{ password: passwordHash, ...other },
 			)
+
+			return updateResult
 		}
 
-		return await this.userModel.updateOne({ _id: userId }, updateUserDto)
+		const updateResult = await this.userModel.updateOne(
+			{ _id: userId },
+			updateUserDto,
+		)
+
+		return updateResult
 	}
 
 	async findByActivationKey(activationKey: string) {
-		return await this.userModel.findOne({ activationKey })
+		const foundUser = await this.userModel.findOne({ activationKey })
+
+		return foundUser
 	}
 
 	async findByEmail(email: string) {
-		return await this.userModel.findOne({ email })
+		const foundUser = await this.userModel.findOne({ email })
+
+		return foundUser
 	}
 
 	async findById(id: string | Types.ObjectId) {
-		return await this.userModel.findById({ _id: id })
+		const foundUser = await this.userModel.findById({ _id: id })
+
+		return foundUser
 	}
 
 	async findByUserName(userName: string) {
-		return await this.userModel.findOne({ userName })
+		const foundUser = await this.userModel.findOne({ userName })
+
+		return foundUser
 	}
 
 	async remove(id: string) {
-		return await this.userModel.deleteOne({ _id: id })
+		const deleteResult = await this.userModel.deleteOne({ _id: id })
+
+		return deleteResult
 	}
 }

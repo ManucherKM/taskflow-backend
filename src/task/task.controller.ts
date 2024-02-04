@@ -1,13 +1,13 @@
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import { StageService } from '@/stage/stage.service'
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Delete,
 	forwardRef,
-	HttpException,
-	HttpStatus,
 	Inject,
+	InternalServerErrorException,
 	Param,
 	Patch,
 	Post,
@@ -29,9 +29,25 @@ export class TaskController {
 	@Post()
 	async create(@Body() createTaskDto: CreateTaskDto) {
 		try {
-			return await this.taskService.create(createTaskDto)
+			const foundStage = await this.stageService.findById(createTaskDto.stageId)
+
+			if (!foundStage) {
+				throw new BadRequestException('Stage not found')
+			}
+
+			const createdTask = await this.taskService.create(createTaskDto)
+
+			if (!createdTask) {
+				throw new BadRequestException('Failed to create task.')
+			}
+
+			foundStage.tasks[foundStage.tasks.length] = createdTask._id
+
+			await foundStage.save()
+
+			return createdTask
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -39,9 +55,21 @@ export class TaskController {
 	@Patch(':id')
 	async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
 		try {
-			return await this.taskService.update(id, updateTaskDto)
+			const updateResult = await this.taskService.update(id, updateTaskDto)
+
+			if (!!updateResult.modifiedCount) {
+				throw new BadRequestException('Failed to update task.')
+			}
+
+			const foundTask = await this.taskService.findById(id)
+
+			if (foundTask) {
+				throw new BadRequestException('Task not found')
+			}
+
+			return foundTask
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -49,15 +77,21 @@ export class TaskController {
 	@Post('/duplicate')
 	async duplicate(@Body() duplicateTaskDto: { id: string; stageId: string }) {
 		try {
-			const createdTask = await this.taskService.duplicate(duplicateTaskDto.id)
+			const { id, stageId } = duplicateTaskDto
 
-			await this.stageService.addTasks(duplicateTaskDto.stageId, [
-				createdTask._id,
-			])
+			const foundTask = await this.taskService.findById(id)
+
+			if (!foundTask) {
+				throw new BadRequestException('Task not found')
+			}
+
+			const createdTask = await this.taskService.duplicate(id)
+
+			await this.stageService.addTasks(stageId, [createdTask._id])
 
 			return createdTask
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -65,12 +99,13 @@ export class TaskController {
 	@Delete(':id')
 	async remove(@Param('id') id: string) {
 		try {
-			const res = await this.taskService.remove(id)
+			const deleteResult = await this.taskService.remove(id)
+
 			return {
-				success: !!res.deletedCount,
+				success: !!deleteResult.deletedCount,
 			}
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 }

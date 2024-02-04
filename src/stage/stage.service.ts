@@ -23,54 +23,51 @@ export class StageService {
 	) {}
 
 	async create(createStageDto: CreateStageDto) {
-		const foundBoard = await this.boardService.findById(createStageDto.boardId)
-
-		if (!foundBoard) {
-			throw new BadRequestException('Board not found')
-		}
-
 		const createdStage = await this.stageModel.create({
 			name: createStageDto.name,
 			tasks: createStageDto.tasks,
 		})
 
-		foundBoard.stages[foundBoard.stages.length] = createdStage._id
-
-		await foundBoard.save()
-
 		return createdStage
 	}
 
-	async findById(id) {
-		return await this.stageModel.findById(id)
-	}
-
 	async update(id: string, updateStageDto: UpdateStageDto) {
-		const updatedStage = await await this.stageModel.updateOne(
+		const updatedStage = await this.stageModel.updateOne(
 			{ _id: id },
 			updateStageDto,
 		)
 
-		const foundStage = await this.getDeepInfo(id)
+		return updatedStage
+	}
+
+	async findById(id) {
+		const foundStage = await this.stageModel.findById(id)
+
+		return foundStage
+	}
+
+	async findByTaskId(taskId) {
+		const foundStage = await this.stageModel.findOne({ tasks: taskId })
+
 		return foundStage
 	}
 
 	async remove(id: string) {
-		return await this.stageModel.deleteOne({ _id: id })
+		const deleteResult = await this.stageModel.deleteOne({ _id: id })
+
+		return deleteResult
 	}
 
 	async getDeepInfo(id: string | Types.ObjectId) {
 		const foundStage = await this.findById(id)
 
 		if (!foundStage) {
-			throw new BadRequestException('Stage not found')
+			return
 		}
 
-		return await foundStage.populate('tasks')
-	}
+		const populatedStage = await foundStage.populate('tasks')
 
-	async findByTaskId(taskId) {
-		return await this.stageModel.findOne({ tasks: taskId })
+		return populatedStage
 	}
 
 	async addTasks(
@@ -94,16 +91,13 @@ export class StageService {
 	}
 
 	async duplicate(id: string) {
-		const foundStage = await this.findById(id)
+		const [foundStage, foundBoard] = await Promise.all([
+			this.findById(id),
+			this.boardService.findByStageId(id),
+		])
 
-		if (!foundStage) {
-			throw new BadRequestException('Stage not found')
-		}
-
-		const foundBoard = await this.boardService.findByStageId(id)
-
-		if (!foundBoard) {
-			throw new BadRequestException('Board not found')
+		if (!foundStage || !foundBoard) {
+			return
 		}
 
 		const createdStage = await this.create({
@@ -123,6 +117,8 @@ export class StageService {
 
 		await this.addTasks(createdStage._id, taskIds)
 
-		return await this.getDeepInfo(createdStage._id)
+		const foundStageInfo = await this.getDeepInfo(createdStage._id)
+
+		return foundStageInfo
 	}
 }

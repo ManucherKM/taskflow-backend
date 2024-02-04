@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 import { CreateBoardDto } from './dto/create-board.dto'
 import { UpdateBoardDto } from './dto/update-board.dto'
 import { Board } from './entities/board.entity'
@@ -29,7 +29,7 @@ export class BoardService {
 		return foundBoards
 	}
 
-	async findById(id: string) {
+	async findById(id: string | Types.ObjectId) {
 		const foundBoard = await this.boardModel.findById(id)
 
 		return foundBoard

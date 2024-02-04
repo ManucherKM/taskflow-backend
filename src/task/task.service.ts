@@ -1,10 +1,4 @@
-import { StageService } from '@/stage/stage.service'
-import {
-	BadRequestException,
-	forwardRef,
-	Inject,
-	Injectable,
-} from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
 import { CreateTaskDto } from './dto/create-task.dto'
@@ -15,53 +9,43 @@ import { Task } from './entities/task.entity'
 export class TaskService {
 	constructor(
 		@InjectModel(Task.name) private readonly taskModel: Model<Task>,
-		@Inject(forwardRef(() => StageService))
-		private readonly stageService: StageService,
 	) {}
 
 	async create(createTaskDto: CreateTaskDto) {
-		const foundStage = await this.stageService.findById(createTaskDto.stageId)
-
-		if (!foundStage) {
-			throw new BadRequestException('Stage not found')
-		}
-
 		const createdTask = await this.taskModel.create({
 			description: createTaskDto.description,
 			title: createTaskDto.title,
 		})
 
-		foundStage.tasks[foundStage.tasks.length] = createdTask._id
-
-		await foundStage.save()
-
 		return createdTask
 	}
 
 	async update(id: string, updateTaskDto: UpdateTaskDto) {
-		const updatedTask = await this.taskModel.updateOne(
+		const updateResult = await this.taskModel.updateOne(
 			{ _id: id },
 			updateTaskDto,
 		)
 
-		const foundTask = await this.findById(id)
-
-		return foundTask
+		return updateResult
 	}
 
 	async remove(id: string) {
-		return await this.taskModel.deleteOne({ _id: id })
+		const deleteResult = await this.taskModel.deleteOne({ _id: id })
+
+		return deleteResult
 	}
 
 	async findById(id: string | Types.ObjectId) {
-		return await this.taskModel.findById(id)
+		const foundTask = await this.taskModel.findById(id)
+
+		return foundTask
 	}
 
 	async duplicate(id: string | Types.ObjectId) {
 		const foundTask = await this.findById(id)
 
 		if (!foundTask) {
-			throw new BadRequestException('Task not found')
+			return
 		}
 
 		const createdTask = await this.taskModel.create({

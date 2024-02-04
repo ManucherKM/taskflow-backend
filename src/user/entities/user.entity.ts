@@ -39,6 +39,12 @@ export class User {
 
 	@Prop({ required: true, unique: true, type: String })
 	activationKey: string
+
+	@Prop({ type: Date })
+	updatedAt: Date
+
+	@Prop({ type: Date })
+	createdAt: Date
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

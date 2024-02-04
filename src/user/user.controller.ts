@@ -1,15 +1,16 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Get,
-	HttpException,
-	HttpStatus,
+	InternalServerErrorException,
 	Patch,
 	UseGuards,
 } from '@nestjs/common'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { UserDocument } from './entities/user.entity'
 import { UserService } from './user.service'
 
 @Controller('user')
@@ -23,10 +24,21 @@ export class UserController {
 		@Body() updateUserDto: UpdateUserDto,
 	) {
 		try {
-			const updatedUser = await this.userService.update(userId, updateUserDto)
-			return { success: !!updatedUser.modifiedCount }
+			const updateResult = await this.userService.update(userId, updateUserDto)
+
+			if (!!updateResult.modifiedCount) {
+				throw new BadRequestException('Failed to update User.')
+			}
+
+			const foundUser = await this.userService.findById(userId)
+
+			if (!foundUser) {
+				throw new BadRequestException('User not found')
+			}
+
+			return foundUser
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -34,19 +46,31 @@ export class UserController {
 	@Get()
 	async findById(@GetUserIdByToken() userId: string) {
 		try {
-			const {
-				password,
-				activationKey,
-				isActivated,
-				lastOnline,
-				__v,
-				updatedAt,
-				createdAt,
-				...other
-			} = ((await this.userService.findById(userId)) as any).toObject()
-			return other
+			const foundUser = await this.userService.findById(userId)
+
+			if (!foundUser) {
+				throw new BadRequestException('User not found')
+			}
+
+			const formatedUser = this.formatUser(foundUser)
+
+			return formatedUser
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
+	}
+
+	async formatUser(user: UserDocument) {
+		const {
+			password,
+			activationKey,
+			isActivated,
+			__v,
+			updatedAt,
+			createdAt,
+			...other
+		} = user
+
+		return other
 	}
 }
