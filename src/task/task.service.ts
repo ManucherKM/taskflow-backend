@@ -39,7 +39,14 @@ export class TaskService {
 	}
 
 	async update(id: string, updateTaskDto: UpdateTaskDto) {
-		return await this.taskModel.updateOne({ _id: id }, updateTaskDto)
+		const updatedTask = await this.taskModel.updateOne(
+			{ _id: id },
+			updateTaskDto,
+		)
+
+		const foundTask = await this.findById(id)
+
+		return foundTask
 	}
 
 	async remove(id: string) {
@@ -57,14 +64,7 @@ export class TaskService {
 			throw new BadRequestException('Task not found')
 		}
 
-		const foundStage = await this.stageService.findByTaskId(id)
-
-		if (!foundStage) {
-			throw new BadRequestException('Stage not found')
-		}
-
-		const createdTask = await this.create({
-			stageId: foundStage._id as unknown as string,
+		const createdTask = await this.taskModel.create({
 			description: foundTask.description,
 			title: foundTask.title,
 		})

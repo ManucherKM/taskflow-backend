@@ -11,5 +11,5 @@ export class CreateStageDto {
 
 	@IsOptional()
 	@IsString()
-	tasks: string[]
+	tasks?: string[]
 }

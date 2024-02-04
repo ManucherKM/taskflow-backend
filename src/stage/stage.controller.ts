@@ -35,11 +35,7 @@ export class StageController {
 		@Body() updateStageDto: UpdateStageDto,
 	) {
 		try {
-			const res = await this.stageService.update(id, updateStageDto)
-
-			return {
-				success: !!res.modifiedCount,
-			}
+			return await this.stageService.update(id, updateStageDto)
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

@@ -1,10 +1,13 @@
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
+import { StageService } from '@/stage/stage.service'
 import {
 	Body,
 	Controller,
 	Delete,
+	forwardRef,
 	HttpException,
 	HttpStatus,
+	Inject,
 	Param,
 	Patch,
 	Post,
@@ -16,7 +19,11 @@ import { TaskService } from './task.service'
 
 @Controller('task')
 export class TaskController {
-	constructor(private readonly taskService: TaskService) {}
+	constructor(
+		private readonly taskService: TaskService,
+		@Inject(forwardRef(() => StageService))
+		private readonly stageService: StageService,
+	) {}
 
 	@UseGuards(JwtAuthGuard)
 	@Post()
@@ -32,10 +39,7 @@ export class TaskController {
 	@Patch(':id')
 	async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
 		try {
-			const res = await this.taskService.update(id, updateTaskDto)
-			return {
-				success: !!res.modifiedCount,
-			}
+			return await this.taskService.update(id, updateTaskDto)
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
@@ -43,9 +47,15 @@ export class TaskController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post('/duplicate')
-	async duplicate(@Body() duplicateTaskDto: { id: string }) {
+	async duplicate(@Body() duplicateTaskDto: { id: string; stageId: string }) {
 		try {
-			return await this.taskService.duplicate(duplicateTaskDto.id)
+			const createdTask = await this.taskService.duplicate(duplicateTaskDto.id)
+
+			await this.stageService.addTasks(duplicateTaskDto.stageId, [
+				createdTask._id,
+			])
+
+			return createdTask
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

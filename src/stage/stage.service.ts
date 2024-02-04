@@ -46,7 +46,13 @@ export class StageService {
 	}
 
 	async update(id: string, updateStageDto: UpdateStageDto) {
-		return await this.stageModel.updateOne({ _id: id }, updateStageDto)
+		const updatedStage = await await this.stageModel.updateOne(
+			{ _id: id },
+			updateStageDto,
+		)
+
+		const foundStage = await this.getDeepInfo(id)
+		return foundStage
 	}
 
 	async remove(id: string) {
@@ -67,6 +73,26 @@ export class StageService {
 		return await this.stageModel.findOne({ tasks: taskId })
 	}
 
+	async addTasks(
+		stageId: string | Types.ObjectId,
+		taskIds: string[] | Types.ObjectId[],
+	) {
+		const foundStage = await this.findById(stageId)
+
+		if (!foundStage) {
+			throw new BadRequestException('Stage not found')
+		}
+
+		for (const id of taskIds) {
+			;(foundStage.tasks as unknown as string[])[foundStage.tasks.length] =
+				id as string
+		}
+
+		await foundStage.save()
+
+		return
+	}
+
 	async duplicate(id: string) {
 		const foundStage = await this.findById(id)
 
@@ -80,23 +106,22 @@ export class StageService {
 			throw new BadRequestException('Board not found')
 		}
 
-		const promiseTasks: Promise<TaskDocument>[] = []
-
-		if (foundStage.tasks.length !== 0) {
-			for (const task of foundStage.tasks) {
-				promiseTasks[promiseTasks.length] = this.taskService.duplicate(task._id)
-			}
-		}
-
-		const copyTasks = await Promise.all(promiseTasks)
-
-		const ids = copyTasks.map(task => task._id)
-
 		const createdStage = await this.create({
 			boardId: foundBoard._id as unknown as string,
 			name: foundStage.name,
-			tasks: ids as unknown[] as string[],
 		})
+
+		const promiseTasks: Promise<TaskDocument>[] = []
+
+		for (const task of foundStage.tasks) {
+			promiseTasks[promiseTasks.length] = this.taskService.duplicate(task._id)
+		}
+
+		const createdTasks = await Promise.all(promiseTasks)
+
+		const taskIds = createdTasks.map(task => task._id)
+
+		await this.addTasks(createdStage._id, taskIds)
 
 		return await this.getDeepInfo(createdStage._id)
 	}
