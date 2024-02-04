@@ -113,7 +113,15 @@ export class StageService {
 
 		const createdTasks = await Promise.all(promiseTasks)
 
-		const taskIds = createdTasks.map(task => task._id)
+		const taskIds: Types.ObjectId[] = []
+
+		for (const task of createdTasks) {
+			if (!task) {
+				continue
+			}
+
+			taskIds[taskIds.length] = task._id
+		}
 
 		await this.addTasks(createdStage._id, taskIds)
 

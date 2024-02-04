@@ -45,6 +45,9 @@ export class User {
 
 	@Prop({ type: Date })
 	createdAt: Date
+
+	@Prop({ type: Number })
+	__v: Date
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

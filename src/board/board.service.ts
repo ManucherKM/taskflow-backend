@@ -38,6 +38,10 @@ export class BoardService {
 	async findDeepById(id: string) {
 		const foundBoard = await this.findById(id)
 
+		if (!foundBoard) {
+			return
+		}
+
 		const deepFound = await foundBoard.populate({
 			path: 'stages',
 			populate: {
@@ -55,12 +59,12 @@ export class BoardService {
 	}
 
 	async findByName(userId: string, name: string) {
-		const foundBoard = await this.boardModel.find({
+		const foundBoards = await this.boardModel.find({
 			users: userId,
-			name: new RegExp(name),
+			name: new RegExp(name, 'i'),
 		})
 
-		return foundBoard
+		return foundBoards
 	}
 
 	async update(id: string, updateBoardDto: UpdateBoardDto) {

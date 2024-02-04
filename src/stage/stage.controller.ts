@@ -42,6 +42,7 @@ export class StageController {
 
 			return createdStage
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -55,7 +56,7 @@ export class StageController {
 		try {
 			const updateResult = await this.stageService.update(id, updateStageDto)
 
-			if (!!updateResult.modifiedCount) {
+			if (!updateResult.modifiedCount) {
 				throw new BadRequestException('Failed to update the Stage.')
 			}
 
@@ -65,16 +66,25 @@ export class StageController {
 				throw new BadRequestException('Stage not found')
 			}
 
-			return updateResult
+			return foundStage
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
 	@UseGuards(JwtAuthGuard)
 	@Post('/duplicate')
-	async duplicate(@Body() duplicateStageDto: { id: string }) {
+	async duplicate(@Body() duplicateStageDto: { id: string; boardId: string }) {
 		try {
+			const foundBoard = await this.boardService.findById(
+				duplicateStageDto.boardId,
+			)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
 			const duplicatedStage = await this.stageService.duplicate(
 				duplicateStageDto.id,
 			)
@@ -83,8 +93,13 @@ export class StageController {
 				throw new BadRequestException('Failed to duplicate stage.')
 			}
 
+			foundBoard.stages[foundBoard.stages.length] = duplicatedStage._id
+
+			await foundBoard.save()
+
 			return duplicatedStage
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -99,6 +114,7 @@ export class StageController {
 				success: !!deleteResult.deletedCount,
 			}
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}

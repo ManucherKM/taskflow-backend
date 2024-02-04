@@ -26,7 +26,7 @@ export class UserController {
 		try {
 			const updateResult = await this.userService.update(userId, updateUserDto)
 
-			if (!!updateResult.modifiedCount) {
+			if (!updateResult.modifiedCount) {
 				throw new BadRequestException('Failed to update User.')
 			}
 
@@ -38,6 +38,7 @@ export class UserController {
 
 			return foundUser
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -56,6 +57,7 @@ export class UserController {
 
 			return formatedUser
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -65,11 +67,11 @@ export class UserController {
 			password,
 			activationKey,
 			isActivated,
-			__v,
 			updatedAt,
 			createdAt,
+			__v,
 			...other
-		} = user
+		} = user.toObject()
 
 		return other
 	}

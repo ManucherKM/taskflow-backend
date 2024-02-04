@@ -5,6 +5,7 @@ import {
 	Body,
 	Controller,
 	Delete,
+	Get,
 	InternalServerErrorException,
 	Param,
 	Patch,
@@ -37,6 +38,30 @@ export class BoardController {
 
 			return createdBoard
 		} catch (e) {
+			console.log(e)
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Post('name')
+	async findByName(
+		@GetUserIdByToken() userId: string,
+		@Body() findByNameDto: { name: string },
+	) {
+		try {
+			const foundBoards = await this.boardService.findByName(
+				userId,
+				findByNameDto.name,
+			)
+
+			if (!Array.isArray(foundBoards)) {
+				throw new BadRequestException('Board not found')
+			}
+
+			return foundBoards
+		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -49,31 +74,13 @@ export class BoardController {
 
 			return foundBoard
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Post('name')
-	async findByName(
-		@GetUserIdByToken() userId: string,
-		@Body() { name }: { name: string },
-	) {
-		try {
-			const foundBoard = await this.boardService.findByName(userId, name)
-
-			if (!foundBoard) {
-				throw new BadRequestException('Board not found')
-			}
-
-			return foundBoard
-		} catch (e) {
-			throw new InternalServerErrorException({ message: e.message })
-		}
-	}
-
-	@UseGuards(JwtAuthGuard)
-	@Post('all')
+	@Get('all')
 	async findAllByUserId(@GetUserIdByToken() userId: string) {
 		try {
 			const foundBoards = await this.boardService.findAllByUserId(userId)
@@ -84,6 +91,7 @@ export class BoardController {
 
 			return foundBoards
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -97,7 +105,7 @@ export class BoardController {
 		try {
 			const updateResult = await this.boardService.update(id, updateBoardDto)
 
-			if (!!updateResult.modifiedCount) {
+			if (!updateResult.modifiedCount) {
 				throw new Error('Failed to update board')
 			}
 
@@ -109,6 +117,7 @@ export class BoardController {
 
 			return foundBoard
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -123,6 +132,7 @@ export class BoardController {
 				success: !!deleteResult,
 			}
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}

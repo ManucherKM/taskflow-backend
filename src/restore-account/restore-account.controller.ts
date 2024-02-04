@@ -34,6 +34,7 @@ export class RestoreAccountController {
 
 			return { success: true }
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -47,6 +48,7 @@ export class RestoreAccountController {
 
 			return { accessToken }
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}

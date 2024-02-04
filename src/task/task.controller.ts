@@ -47,6 +47,7 @@ export class TaskController {
 
 			return createdTask
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -57,18 +58,19 @@ export class TaskController {
 		try {
 			const updateResult = await this.taskService.update(id, updateTaskDto)
 
-			if (!!updateResult.modifiedCount) {
+			if (!updateResult.modifiedCount) {
 				throw new BadRequestException('Failed to update task.')
 			}
 
 			const foundTask = await this.taskService.findById(id)
 
-			if (foundTask) {
+			if (!foundTask) {
 				throw new BadRequestException('Task not found')
 			}
 
 			return foundTask
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -91,6 +93,7 @@ export class TaskController {
 
 			return createdTask
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -105,6 +108,7 @@ export class TaskController {
 				success: !!deleteResult.deletedCount,
 			}
 		} catch (e) {
+			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
