@@ -1,10 +1,10 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
+	BadRequestException,
 	Controller,
 	Get,
-	HttpException,
-	HttpStatus,
+	InternalServerErrorException,
 	Post,
 	UploadedFile,
 	UseGuards,
@@ -30,11 +30,23 @@ export class FileController {
 		@GetUserIdByToken() userId: string,
 	) {
 		try {
+			const foundFile = await this.fileService.findByFileName(file.filename)
+
+			if (!!foundFile) {
+				throw new BadRequestException('Such a file already exists.')
+			}
+
 			const createdFile = await this.fileService.create(userId, file)
+
+			if (!createdFile) {
+				throw new BadRequestException('Failed to create file.')
+			}
+
 			const formatedFile = this.fileService.formatFileModel(createdFile)
+
 			return formatedFile
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -43,21 +55,16 @@ export class FileController {
 	async findByUserId(@GetUserIdByToken() userId: string) {
 		try {
 			const foundFiles = await this.fileService.findByUserId(userId)
-			const formatedFiles = foundFiles.map(file =>
-				this.fileService.formatFileModel(file.toObject()),
-			)
+
+			if (!Array.isArray(foundFiles)) {
+				throw new BadRequestException('Files not found')
+			}
+
+			const formatedFiles = this.fileService.formatMultipleFiles(foundFiles)
+
 			return formatedFiles
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@Get('avatars')
-	async getAvatars() {
-		try {
-			return await this.fileService.getAvatars()
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 }

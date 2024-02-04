@@ -4,7 +4,7 @@ import { UserService } from '@/user/user.service'
 import { getHTMLForOTP } from '@/utils/getHTMLForOTP'
 import { MailerService } from '@nestjs-modules/mailer'
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { CreateRestoreAccountDto } from './dto/create-restore-account.dto'
+import { RestoreAccountDto } from './dto/restore-account.dto'
 import { VerificationOtpDto } from './dto/verification-otp.dto'
 
 @Injectable()
@@ -16,41 +16,47 @@ export class RestoreAccountService {
 		private readonly userService: UserService,
 	) {}
 
-	async createOtp({ email }: CreateRestoreAccountDto) {
-		const foundUser = await this.userService.findByEmail(email)
+	async createOtp({ email }: RestoreAccountDto) {
+		const foundOtp = await this.otpService.findbyEmail(email)
 
-		if (!foundUser?.isActivated) {
-			throw new BadRequestException('The user could not be found.')
+		if (foundOtp) {
+			const otp = await this.otpService.generateOtp()
+
+			foundOtp.otp = otp
+
+			await foundOtp.save()
+
+			await this.sendOtpToEmail(otp, email)
+
+			return otp
 		}
 
-		const otp = await this.otpService.create({ email })
+		const createdOtp = await this.otpService.create({ email })
 
-		await this.sendOtpToEmail(otp, email)
+		await this.sendOtpToEmail(createdOtp.otp, email)
 
-		return otp
+		return createdOtp.otp
 	}
 
 	async sendOtpToEmail(otp: number, email: string) {
-		return await this.mailerService.sendMail({
+		const sentMessageInfo = await this.mailerService.sendMail({
 			to: email,
 			from: process.env.NODEMAILER_USER,
 			subject: 'TaskFlow account restore.',
 			html: getHTMLForOTP(otp),
 		})
+
+		return sentMessageInfo
 	}
 
 	async verificationOtp({ email, otp }: VerificationOtpDto) {
-		const foundUser = await this.userService.findByEmail(email)
-
-		if (!foundUser?.isActivated) {
-			throw new BadRequestException('The user could not be found.')
-		}
-
 		const foundOtp = await this.otpService.findbyOtp(otp)
 
 		if (!foundOtp || foundOtp.email !== email) {
 			throw new BadRequestException('Failed to find OTP.')
 		}
+
+		const foundUser = await this.userService.findByEmail(email)
 
 		const userId = foundUser._id.toString()
 
@@ -58,7 +64,7 @@ export class RestoreAccountService {
 			userId,
 		})
 
-		await this.otpService.removeByOtp(otp)
+		const deleteResult = await this.otpService.removeByOtp(otp)
 
 		return {
 			accessToken,

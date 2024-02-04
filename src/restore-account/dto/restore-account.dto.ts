@@ -1,6 +1,6 @@
 import { IsEmail } from 'class-validator'
 
-export class CreateRestoreAccountDto {
+export class RestoreAccountDto {
 	@IsEmail()
 	email: string
 }

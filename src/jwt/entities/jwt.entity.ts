@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { HydratedDocument, SchemaTypes } from 'mongoose'
+import { HydratedDocument, SchemaTypes, Types } from 'mongoose'
 
 export type JwtDocument = HydratedDocument<Jwt>
 
@@ -13,7 +13,7 @@ export class Jwt {
 		required: true,
 		unique: true,
 	})
-	userId: string
+	userId: Types.ObjectId
 
 	@Prop({ required: true, unique: true, type: String })
 	refreshToken: string

@@ -7,9 +7,10 @@ export type OtpDocument = HydratedDocument<Otp>
 	timestamps: true,
 })
 export class Otp {
-	@Prop({ required: true, unique: true })
+	@Prop({ required: true, unique: true, type: String })
 	email: string
-	@Prop({ required: true, unique: true })
+
+	@Prop({ required: true, unique: true, type: Number })
 	otp: number
 }
 

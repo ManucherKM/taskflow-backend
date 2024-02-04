@@ -22,13 +22,17 @@ export class BoardService {
 	}
 
 	async findAllByUserId(userId: string) {
-		return await this.boardModel.find({
+		const foundBoards = await this.boardModel.find({
 			users: userId,
 		})
+
+		return foundBoards
 	}
 
 	async findById(id: string) {
-		return await this.boardModel.findById(id)
+		const foundBoard = await this.boardModel.findById(id)
+
+		return foundBoard
 	}
 
 	async findDeepById(id: string) {
@@ -45,21 +49,32 @@ export class BoardService {
 	}
 
 	async findByStageId(stageId: string) {
-		return await this.boardModel.findOne({ stages: stageId })
+		const foundBoard = await this.boardModel.findOne({ stages: stageId })
+
+		return foundBoard
 	}
 
 	async findByName(userId: string, name: string) {
-		return await this.boardModel.find({
+		const foundBoard = await this.boardModel.find({
 			users: userId,
 			name: new RegExp(name),
 		})
+
+		return foundBoard
 	}
 
 	async update(id: string, updateBoardDto: UpdateBoardDto) {
-		return await this.boardModel.updateOne({ _id: id }, updateBoardDto)
+		const updateResult = await this.boardModel.updateOne(
+			{ _id: id },
+			updateBoardDto,
+		)
+
+		return updateResult
 	}
 
 	async remove(id: string) {
-		return await this.boardModel.deleteOne({ _id: id })
+		const removeResult = await this.boardModel.deleteOne({ _id: id })
+
+		return removeResult
 	}
 }

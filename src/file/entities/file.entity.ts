@@ -8,7 +8,7 @@ export type FileDocument = HydratedDocument<File>
 })
 export class File {
 	@Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'User' })
-	userId: string
+	userId: Types.ObjectId
 
 	@Prop({ required: true, unique: true, type: String })
 	fileName: string

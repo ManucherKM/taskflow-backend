@@ -1,11 +1,11 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Delete,
-	HttpException,
-	HttpStatus,
+	InternalServerErrorException,
 	Param,
 	Patch,
 	Post,
@@ -26,19 +26,30 @@ export class BoardController {
 		@Body() createBoardDto: CreateBoardDto,
 	) {
 		try {
-			return await this.boardService.create(userId, createBoardDto)
+			const createdBoard = await this.boardService.create(
+				userId,
+				createBoardDto,
+			)
+
+			if (!createdBoard) {
+				throw new BadRequestException('Failed to create Board.')
+			}
+
+			return createdBoard
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Post('all')
-	async findAllByUserId(@GetUserIdByToken() userId: string) {
+	@Post(':id')
+	async findDeepById(@Body() { id }: { id: string }) {
 		try {
-			return await this.boardService.findAllByUserId(userId)
+			const foundBoard = await this.boardService.findDeepById(id)
+
+			return foundBoard
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -49,9 +60,31 @@ export class BoardController {
 		@Body() { name }: { name: string },
 	) {
 		try {
-			return await this.boardService.findByName(userId, name)
+			const foundBoard = await this.boardService.findByName(userId, name)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			return foundBoard
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Post('all')
+	async findAllByUserId(@GetUserIdByToken() userId: string) {
+		try {
+			const foundBoards = await this.boardService.findAllByUserId(userId)
+
+			if (!Array.isArray(foundBoards)) {
+				throw new BadRequestException('Boards not found')
+			}
+
+			return foundBoards
+		} catch (e) {
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -62,12 +95,21 @@ export class BoardController {
 		@Body() updateBoardDto: UpdateBoardDto,
 	) {
 		try {
-			const updatedBoard = await this.boardService.update(id, updateBoardDto)
-			return {
-				success: !!updatedBoard.modifiedCount,
+			const updateResult = await this.boardService.update(id, updateBoardDto)
+
+			if (!!updateResult.modifiedCount) {
+				throw new Error('Failed to update board')
 			}
+
+			const foundBoard = await this.boardService.findById(id)
+
+			if (!foundBoard) {
+				throw new Error('Board not found')
+			}
+
+			return foundBoard
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -75,22 +117,13 @@ export class BoardController {
 	@Delete(':id')
 	async remove(@Param('id') id: string) {
 		try {
-			const res = await this.boardService.remove(id)
+			const deleteResult = await this.boardService.remove(id)
+
 			return {
-				success: !!res.deletedCount,
+				success: !!deleteResult,
 			}
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
-	@UseGuards(JwtAuthGuard)
-	@Post(':id')
-	async findDeepById(@Body() { id }: { id: string }) {
-		try {
-			return await this.boardService.findDeepById(id)
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 }

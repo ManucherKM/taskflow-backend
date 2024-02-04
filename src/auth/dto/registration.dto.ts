@@ -22,10 +22,6 @@ export class RegistrationDto {
 
 	@IsOptional()
 	@IsString()
-	avatar?: string
-
-	@IsOptional()
-	@IsString()
 	firstName?: string
 
 	@IsOptional()

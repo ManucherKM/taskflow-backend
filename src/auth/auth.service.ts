@@ -31,7 +31,7 @@ export class AuthService {
 				foundUser.activationKey,
 			)
 
-			return { success: true }
+			return
 		}
 
 		const passwordHash = await getHash(registrationDto.password)
@@ -39,18 +39,12 @@ export class AuthService {
 		const activationKey = v4()
 
 		await this.userService.create({
-			email: registrationDto.email,
+			...registrationDto,
 			password: passwordHash,
-			userName: registrationDto.userName,
-			firstName: registrationDto.firstName,
-			lastName: registrationDto.lastName,
-			avatar: registrationDto.avatar,
 			activationKey,
 		})
 
 		await this.sendMailAccountActivation(registrationDto.email, activationKey)
-
-		return { success: true }
 	}
 
 	async loginWithEmail(loginDto: LoginWithEmailDto) {

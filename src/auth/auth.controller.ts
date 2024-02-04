@@ -20,7 +20,8 @@ export class AuthController {
 	@Post('registration')
 	async registration(@Body() registrationDto: RegistrationDto) {
 		try {
-			return await this.authService.registration(registrationDto)
+			await this.authService.registration(registrationDto)
+			return { success: true }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}
@@ -60,21 +61,21 @@ export class AuthController {
 		}
 	}
 
-	@Get('logout')
-	async logout(@Res({ passthrough: true }) res: Response) {
-		try {
-			res.clearCookie('refreshToken')
-			return { success: true }
-		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
-		}
-	}
-
 	@Post('username')
 	async checkUserName(@Body() { userName }: { userName: string }) {
 		try {
 			const isExist = await this.authService.checkUserName(userName)
 			return { exist: isExist }
+		} catch (e) {
+			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+		}
+	}
+
+	@Get('logout')
+	async logout(@Res({ passthrough: true }) res: Response) {
+		try {
+			res.clearCookie('refreshToken')
+			return { success: true }
 		} catch (e) {
 			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
 		}

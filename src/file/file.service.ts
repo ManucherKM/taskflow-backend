@@ -1,8 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import fs from 'fs'
 import { Model } from 'mongoose'
-import { join } from 'path'
 import { File, TFile } from './entities/file.entity'
 
 @Injectable()
@@ -12,48 +10,50 @@ export class FileService {
 	) {}
 
 	async create(userId: string, file: Express.Multer.File) {
-		const foundFile = await this.findByFileName(file.filename)
-
-		if (foundFile) {
-			throw new BadRequestException('Such a file already exists.')
-		}
-
-		return await this.fileModel.create({
+		const createdFile = await this.fileModel.create({
 			fileName: file.filename,
 			mimetype: file.mimetype,
 			originalName: file.originalname,
 			size: file.size,
 			userId,
 		})
+
+		return createdFile
 	}
 
 	async findByFileName(fileName: string) {
-		return await this.fileModel.findOne({ fileName })
+		const foundFile = await this.fileModel.findOne({ fileName })
+
+		return foundFile
 	}
 
 	async findByUserId(userId: string) {
-		return await this.fileModel.find({ userId })
+		const foundFile = await this.fileModel.find({ userId })
+
+		return foundFile
 	}
 
 	async findById(id: string) {
-		return await this.fileModel.findById({ _id: id })
-	}
+		const foundFile = await this.fileModel.findById({ _id: id })
 
-	async getAvatars() {
-		const pathToDir = join('uploads', 'avatar')
-
-		const avatars = fs
-			.readdirSync(pathToDir)
-			.map(file => `${process.env.API_URL}/uploads/avatar/${file}`)
-
-		return avatars
+		return foundFile
 	}
 
 	formatFileModel(fileModel: TFile) {
 		return {
-			id: fileModel._id.toString(),
+			id: fileModel._id,
 			fileName: fileModel.fileName,
 			originalName: fileModel.originalName,
 		}
+	}
+
+	formatMultipleFiles(fileModels: TFile[]) {
+		const formatedFiles = fileModels.map(file => ({
+			id: file._id,
+			fileName: file.fileName,
+			originalName: file.originalName,
+		}))
+
+		return formatedFiles
 	}
 }

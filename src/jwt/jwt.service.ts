@@ -1,9 +1,9 @@
 import { UserService } from '@/user/user.service'
 import { EVariantGetData, getDataByToken } from '@/utils/getDataByToken'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import * as jwt from 'jsonwebtoken'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 import { CreateJwtDto } from './dto/create-jwt.dto'
 import { Jwt } from './entities/jwt.entity'
 import { IDataToken } from './types'
@@ -25,39 +25,30 @@ export class JwtService {
 		}
 	}
 
-	async findByUserId(userId: string) {
-		return await this.jwtModel.findOne({ userId })
-	}
+	async findByUserId(userId: string | Types.ObjectId) {
+		const foundToken = await this.jwtModel.findOne({ userId })
 
-	async getNewAccessToken(refreshToken: string) {
-		const [isValid, dataToken] = await this.validateToken(
-			refreshToken,
-			'refresh',
-		)
-
-		if (!isValid) {
-			throw new BadRequestException('Invalid token.')
-		}
-
-		return {
-			accessToken: this.getAccessToken(dataToken),
-		}
+		return foundToken
 	}
 
 	getAccessToken(payload: IDataToken) {
-		return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+		const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
 			expiresIn: 30 * 60, // 30m
 		})
+
+		return accessToken
 	}
 
 	private getRefreshToken(payload: IDataToken) {
-		return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
+		const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
 			expiresIn: 30 * 24 * 60 * 60, // 30d
 		})
+
+		return refreshToken
 	}
 
 	async generateRefreshToken(payload: IDataToken) {
-		const foundToken = await this.jwtModel.findOne({ userId: payload.userId })
+		const foundToken = await this.findByUserId(payload.userId)
 
 		if (foundToken) {
 			const token = this.getRefreshToken(payload)
@@ -71,15 +62,21 @@ export class JwtService {
 
 		const refreshToken = this.getRefreshToken(payload)
 
-		await this.jwtModel.create({
+		const createdToken = await this.jwtModel.create({
 			refreshToken,
 			userId: payload.userId,
 		})
 
-		return refreshToken
+		return createdToken.refreshToken
 	}
 
-	async validateToken(token: string, variant: `${EVariantGetData}`) {
+	async validateToken(
+		token: string,
+		variant: `${EVariantGetData}`,
+	): Promise<{
+		isValid: boolean
+		data: IDataToken | null
+	}> {
 		const { userId } = getDataByToken(token, variant)
 
 		const foundUser = await this.userService.findById(userId)
@@ -87,11 +84,17 @@ export class JwtService {
 		const isUserExist = !!foundUser && foundUser.isActivated
 
 		if (!isUserExist) {
-			throw new BadRequestException('Invalid token')
+			return {
+				isValid: false,
+				data: null,
+			}
 		}
 
 		const dataToken: IDataToken = { userId }
 
-		return [true, dataToken] as [boolean, IDataToken]
+		return {
+			isValid: true,
+			data: dataToken,
+		}
 	}
 }

@@ -1,25 +1,40 @@
+import { UserService } from '@/user/user.service'
 import {
+	BadRequestException,
 	Body,
 	Controller,
-	HttpException,
-	HttpStatus,
+	InternalServerErrorException,
 	Post,
 } from '@nestjs/common'
-import { CreateRestoreAccountDto } from './dto/create-restore-account.dto'
+import { RestoreAccountDto } from './dto/restore-account.dto'
 import { VerificationOtpDto } from './dto/verification-otp.dto'
 import { RestoreAccountService } from './restore-account.service'
 
 @Controller('restore-account')
 export class RestoreAccountController {
-	constructor(private readonly restoreAccountService: RestoreAccountService) {}
+	constructor(
+		private readonly restoreAccountService: RestoreAccountService,
+		private readonly userService: UserService,
+	) {}
 
 	@Post()
-	async createOtp(@Body() createRestoreAccountDto: CreateRestoreAccountDto) {
+	async createOtp(@Body() restoreAccountDto: RestoreAccountDto) {
 		try {
-			await this.restoreAccountService.createOtp(createRestoreAccountDto)
+			const foundUser = await this.userService.findByEmail(
+				restoreAccountDto.email,
+			)
+
+			if (!foundUser?.isActivated) {
+				throw new BadRequestException('The user could not be found.')
+			}
+
+			const createdOtp = await this.restoreAccountService.createOtp(
+				restoreAccountDto,
+			)
+
 			return { success: true }
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 
@@ -32,7 +47,7 @@ export class RestoreAccountController {
 
 			return { accessToken }
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 }

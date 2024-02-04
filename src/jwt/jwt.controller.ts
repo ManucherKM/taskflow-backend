@@ -1,7 +1,7 @@
 import {
 	Controller,
-	HttpException,
-	HttpStatus,
+	ForbiddenException,
+	InternalServerErrorException,
 	Post,
 	Req,
 } from '@nestjs/common'
@@ -17,13 +17,20 @@ export class JwtController {
 		try {
 			const refreshToken = req.cookies['refreshToken']
 
-			const { accessToken } = await this.jwtService.getNewAccessToken(
+			const { isValid, data } = await this.jwtService.validateToken(
 				refreshToken,
+				'refresh',
 			)
+
+			if (!isValid) {
+				throw new ForbiddenException('The token is invalid.')
+			}
+
+			const accessToken = await this.jwtService.getAccessToken(data)
 
 			return { accessToken }
 		} catch (e) {
-			throw new HttpException({ message: e.message }, HttpStatus.BAD_REQUEST)
+			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
 }
