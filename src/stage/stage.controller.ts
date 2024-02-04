@@ -42,7 +42,6 @@ export class StageController {
 
 			return createdStage
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -68,7 +67,6 @@ export class StageController {
 
 			return foundStage
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -99,7 +97,6 @@ export class StageController {
 
 			return duplicatedStage
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -114,7 +111,6 @@ export class StageController {
 				success: !!deleteResult.deletedCount,
 			}
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}

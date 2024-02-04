@@ -38,7 +38,6 @@ export class UserController {
 
 			return foundUser
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -57,7 +56,6 @@ export class UserController {
 
 			return formatedUser
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}

@@ -30,7 +30,6 @@ export class JwtController {
 
 			return { accessToken }
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}

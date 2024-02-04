@@ -46,7 +46,6 @@ export class FileController {
 
 			return formatedFile
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -65,7 +64,6 @@ export class FileController {
 
 			return formatedFiles
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}

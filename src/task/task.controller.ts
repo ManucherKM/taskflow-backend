@@ -47,7 +47,6 @@ export class TaskController {
 
 			return createdTask
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -70,7 +69,6 @@ export class TaskController {
 
 			return foundTask
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -93,7 +91,6 @@ export class TaskController {
 
 			return createdTask
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
@@ -108,7 +105,6 @@ export class TaskController {
 				success: !!deleteResult.deletedCount,
 			}
 		} catch (e) {
-			console.log(e)
 			throw new InternalServerErrorException({ message: e.message })
 		}
 	}
