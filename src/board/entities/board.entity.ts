@@ -22,6 +22,15 @@ export class Board {
 
 	@Prop({ required: true, type: [{ type: SchemaTypes.ObjectId, ref: 'User' }] })
 	users: string[]
+
+	@Prop({ type: Date })
+	updatedAt: Date
+
+	@Prop({ type: Date })
+	createdAt: Date
+
+	@Prop({ type: Number })
+	__v: Date
 }
 
 export const BoardSchema = SchemaFactory.createForClass(Board)

@@ -13,6 +13,15 @@ export class Stage {
 
 	@Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Task' }], default: [] })
 	tasks: TaskDocument[] | Types.ObjectId[]
+
+	@Prop({ type: Date })
+	updatedAt: Date
+
+	@Prop({ type: Date })
+	createdAt: Date
+
+	@Prop({ type: Number })
+	__v: Date
 }
 
 export const StageSchema = SchemaFactory.createForClass(Stage)

@@ -21,6 +21,15 @@ export class File {
 
 	@Prop({ required: true, type: String })
 	mimetype: string
+
+	@Prop({ type: Date })
+	updatedAt: Date
+
+	@Prop({ type: Date })
+	createdAt: Date
+
+	@Prop({ type: Number })
+	__v: Date
 }
 
 export type TFile = File & {

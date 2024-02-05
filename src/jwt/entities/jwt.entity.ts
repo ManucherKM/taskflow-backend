@@ -17,6 +17,15 @@ export class Jwt {
 
 	@Prop({ required: true, unique: true, type: String })
 	refreshToken: string
+
+	@Prop({ type: Date })
+	updatedAt: Date
+
+	@Prop({ type: Date })
+	createdAt: Date
+
+	@Prop({ type: Number })
+	__v: Date
 }
 
 export const JwtSchema = SchemaFactory.createForClass(Jwt)

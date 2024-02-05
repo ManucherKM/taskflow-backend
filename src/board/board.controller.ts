@@ -65,6 +65,31 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@Post('leave')
+	async leave(
+		@GetUserIdByToken() userId: string,
+		@Body() leaveDto: { boardId: string },
+	) {
+		try {
+			const foundBoard = await this.boardService.findById(leaveDto.boardId)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			const savedBoard = await this.boardService.leave(userId, leaveDto.boardId)
+
+			if (!savedBoard) {
+				throw new BadRequestException('Failed to leave the board.')
+			}
+
+			return savedBoard
+		} catch (e) {
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
 	@Post(':id')
 	async findDeepById(@Body() { id }: { id: string }) {
 		try {

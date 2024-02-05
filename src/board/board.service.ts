@@ -76,6 +76,26 @@ export class BoardService {
 		return updateResult
 	}
 
+	async leave(userId: string, boardId: string) {
+		const foundBoard = await this.findById(boardId)
+
+		if (!foundBoard) {
+			return
+		}
+
+		const foundIdx = foundBoard.users.indexOf(userId)
+
+		if (foundIdx === -1) {
+			return
+		}
+
+		foundBoard.users.splice(foundIdx, 1)
+
+		const savedBoard = await foundBoard.save()
+
+		return savedBoard
+	}
+
 	async remove(id: string) {
 		const removeResult = await this.boardModel.deleteOne({ _id: id })
 
