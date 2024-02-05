@@ -1,5 +1,6 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
+import SerializerInterceptor from '@/interceptors/Serializer.interceptor'
 import {
 	BadRequestException,
 	Body,
@@ -8,9 +9,10 @@ import {
 	InternalServerErrorException,
 	Patch,
 	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { UserDocument } from './entities/user.entity'
+import { User } from './entities/user.entity'
 import { UserService } from './user.service'
 
 @Controller('user')
@@ -43,6 +45,7 @@ export class UserController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(User))
 	@Get()
 	async findById(@GetUserIdByToken() userId: string) {
 		try {
@@ -52,25 +55,9 @@ export class UserController {
 				throw new BadRequestException('User not found')
 			}
 
-			const formatedUser = this.formatUser(foundUser)
-
-			return formatedUser
+			return foundUser
 		} catch (e) {
 			throw new InternalServerErrorException({ message: e.message })
 		}
-	}
-
-	async formatUser(user: UserDocument) {
-		const {
-			password,
-			activationKey,
-			isActivated,
-			updatedAt,
-			createdAt,
-			__v,
-			...other
-		} = user.toObject()
-
-		return other
 	}
 }

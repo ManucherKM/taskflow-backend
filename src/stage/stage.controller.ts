@@ -1,5 +1,6 @@
 import { BoardService } from '@/board/board.service'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
+import SerializerInterceptor from '@/interceptors/Serializer.interceptor'
 import {
 	BadRequestException,
 	Body,
@@ -10,9 +11,11 @@ import {
 	Patch,
 	Post,
 	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common'
 import { CreateStageDto } from './dto/create-stage.dto'
 import { UpdateStageDto } from './dto/update-stage.dto'
+import { Stage } from './entities/stage.entity'
 import { StageService } from './stage.service'
 
 @Controller('stage')
@@ -23,6 +26,7 @@ export class StageController {
 	) {}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Stage))
 	@Post()
 	async create(@Body() createStageDto: CreateStageDto) {
 		try {
@@ -47,6 +51,7 @@ export class StageController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Stage))
 	@Patch(':id')
 	async update(
 		@Param('id') id: string,
@@ -72,6 +77,7 @@ export class StageController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Stage))
 	@Post('/duplicate')
 	async duplicate(@Body() duplicateStageDto: { id: string; boardId: string }) {
 		try {

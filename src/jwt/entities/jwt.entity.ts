@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Exclude, Transform } from 'class-transformer'
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose'
 
 export type JwtDocument = HydratedDocument<Jwt>
@@ -7,6 +8,9 @@ export type JwtDocument = HydratedDocument<Jwt>
 	timestamps: true,
 })
 export class Jwt {
+	@Transform(({ value }) => value.toString())
+	_id: Types.ObjectId
+
 	@Prop({
 		type: SchemaTypes.ObjectId,
 		ref: 'User',
@@ -18,14 +22,14 @@ export class Jwt {
 	@Prop({ required: true, unique: true, type: String })
 	refreshToken: string
 
-	@Prop({ type: Date })
+	@Exclude()
 	updatedAt: Date
 
-	@Prop({ type: Date })
+	@Exclude()
 	createdAt: Date
 
-	@Prop({ type: Number })
-	__v: Date
+	@Exclude()
+	__v: number
 }
 
 export const JwtSchema = SchemaFactory.createForClass(Jwt)

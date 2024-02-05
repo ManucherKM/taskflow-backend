@@ -1,5 +1,6 @@
 import { StageDocument } from '@/stage/entities/stage.entity'
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Exclude, Transform } from 'class-transformer'
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose'
 
 export type BoardDocument = HydratedDocument<Board>
@@ -8,6 +9,9 @@ export type BoardDocument = HydratedDocument<Board>
 	timestamps: true,
 })
 export class Board {
+	@Transform(({ value }) => value.toString())
+	_id: Types.ObjectId
+
 	@Prop({ required: true, type: String })
 	name: string
 
@@ -23,14 +27,14 @@ export class Board {
 	@Prop({ required: true, type: [{ type: SchemaTypes.ObjectId, ref: 'User' }] })
 	users: string[]
 
-	@Prop({ type: Date })
+	@Exclude()
 	updatedAt: Date
 
-	@Prop({ type: Date })
+	@Exclude()
 	createdAt: Date
 
-	@Prop({ type: Number })
-	__v: Date
+	@Exclude()
+	__v: number
 }
 
 export const BoardSchema = SchemaFactory.createForClass(Board)

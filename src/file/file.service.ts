@@ -39,14 +39,6 @@ export class FileService {
 		return foundFile
 	}
 
-	formatFileModel(fileModel: TFile) {
-		return {
-			id: fileModel._id,
-			fileName: fileModel.fileName,
-			originalName: fileModel.originalName,
-		}
-	}
-
 	formatMultipleFiles(fileModels: TFile[]) {
 		const formatedFiles = fileModels.map(file => ({
 			id: file._id,
