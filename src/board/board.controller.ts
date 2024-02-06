@@ -1,6 +1,5 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
-import SerializerInterceptor from '@/interceptors/Serializer.interceptor'
 import {
 	BadRequestException,
 	Body,
@@ -12,19 +11,16 @@ import {
 	Patch,
 	Post,
 	UseGuards,
-	UseInterceptors,
 } from '@nestjs/common'
 import { BoardService } from './board.service'
 import { CreateBoardDto } from './dto/create-board.dto'
 import { UpdateBoardDto } from './dto/update-board.dto'
-import { Board } from './entities/board.entity'
 
 @Controller('board')
 export class BoardController {
 	constructor(private readonly boardService: BoardService) {}
 
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(SerializerInterceptor(Board))
 	@Post()
 	async create(
 		@GetUserIdByToken() userId: string,
@@ -47,7 +43,6 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(SerializerInterceptor(Board))
 	@Post('name')
 	async findByName(
 		@GetUserIdByToken() userId: string,
@@ -70,7 +65,6 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(SerializerInterceptor(Board))
 	@Post('leave')
 	async leave(
 		@GetUserIdByToken() userId: string,
@@ -96,7 +90,6 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(SerializerInterceptor(Board))
 	@Post(':id')
 	async findDeepById(@Body() { id }: { id: string }) {
 		try {

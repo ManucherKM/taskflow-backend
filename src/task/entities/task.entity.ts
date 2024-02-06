@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Exclude, Transform } from 'class-transformer'
 import { HydratedDocument, Types } from 'mongoose'
 
 export type TaskDocument = HydratedDocument<Task>
@@ -8,7 +7,6 @@ export type TaskDocument = HydratedDocument<Task>
 	timestamps: true,
 })
 export class Task {
-	@Transform(({ value }) => value.toString())
 	_id: Types.ObjectId
 
 	@Prop({ required: true, type: String })
@@ -17,13 +15,10 @@ export class Task {
 	@Prop({ required: true, type: String })
 	description: string
 
-	@Exclude()
 	updatedAt: Date
 
-	@Exclude()
 	createdAt: Date
 
-	@Exclude()
 	__v: number
 }
 

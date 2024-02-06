@@ -1,6 +1,5 @@
 import { BoardService } from '@/board/board.service'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
-import SerializerInterceptor from '@/interceptors/Serializer.interceptor'
 import {
 	BadRequestException,
 	Body,
@@ -11,11 +10,9 @@ import {
 	Patch,
 	Post,
 	UseGuards,
-	UseInterceptors,
 } from '@nestjs/common'
 import { CreateStageDto } from './dto/create-stage.dto'
 import { UpdateStageDto } from './dto/update-stage.dto'
-import { Stage } from './entities/stage.entity'
 import { StageService } from './stage.service'
 
 @Controller('stage')
@@ -26,7 +23,6 @@ export class StageController {
 	) {}
 
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(SerializerInterceptor(Stage))
 	@Post()
 	async create(@Body() createStageDto: CreateStageDto) {
 		try {
@@ -51,7 +47,6 @@ export class StageController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(SerializerInterceptor(Stage))
 	@Patch(':id')
 	async update(
 		@Param('id') id: string,
@@ -77,7 +72,6 @@ export class StageController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(SerializerInterceptor(Stage))
 	@Post('/duplicate')
 	async duplicate(@Body() duplicateStageDto: { id: string; boardId: string }) {
 		try {
@@ -89,6 +83,12 @@ export class StageController {
 				throw new BadRequestException('Board not found')
 			}
 
+			const foundStage = await this.stageService.findById(duplicateStageDto.id)
+
+			if (!foundStage) {
+				throw new BadRequestException('Stage not found')
+			}
+
 			const duplicatedStage = await this.stageService.duplicate(
 				duplicateStageDto.id,
 			)
@@ -97,7 +97,11 @@ export class StageController {
 				throw new BadRequestException('Failed to duplicate stage.')
 			}
 
-			foundBoard.stages[foundBoard.stages.length] = duplicatedStage._id
+			const foundIdx = foundBoard.stages.findIndex(
+				pred => pred.toString() === foundStage._id.toString(),
+			)
+
+			foundBoard.stages.splice(foundIdx + 1, 0, duplicatedStage._id)
 
 			await foundBoard.save()
 
@@ -111,7 +115,21 @@ export class StageController {
 	@Delete(':id')
 	async remove(@Param('id') id: string) {
 		try {
+			const foundBoard = await this.boardService.findByStageId(id)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
 			const deleteResult = await this.stageService.remove(id)
+
+			const foudnIdx = foundBoard.stages.findIndex(
+				pred => pred.toString() === id.toString(),
+			)
+
+			foundBoard.stages.splice(foudnIdx, 1)
+
+			await foundBoard.save()
 
 			return {
 				success: !!deleteResult.deletedCount,
