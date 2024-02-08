@@ -1,7 +1,9 @@
 import { MailerModule } from '@nestjs-modules/mailer'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { APP_GUARD } from '@nestjs/core'
 import { MongooseModule } from '@nestjs/mongoose'
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { ActivationModule } from './activation/activation.module'
 import { AppController } from './app.controller'
 import { AuthModule } from './auth/auth.module'
@@ -37,7 +39,19 @@ import { UserModule } from './user/user.module'
 		TaskModule,
 		OtpModule,
 		RestoreAccountModule,
+		ThrottlerModule.forRoot([
+			{
+				ttl: 1000,
+				limit: 20,
+			},
+		]),
 	],
 	controllers: [AppController],
+	providers: [
+		{
+			provide: APP_GUARD,
+			useClass: ThrottlerGuard,
+		},
+	],
 })
 export class AppModule {}
