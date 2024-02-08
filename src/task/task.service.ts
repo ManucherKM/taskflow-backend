@@ -35,6 +35,14 @@ export class TaskService {
 		return deleteResult
 	}
 
+	async removeMany(ids: string[] | Types.ObjectId[]) {
+		const deleteResult = await this.taskModel.deleteMany({
+			_id: ids,
+		})
+
+		return deleteResult
+	}
+
 	async findById(id: string | Types.ObjectId) {
 		const foundTask = await this.taskModel.findById(id)
 

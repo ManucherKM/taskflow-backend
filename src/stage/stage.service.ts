@@ -17,6 +17,7 @@ import { Stage } from './entities/stage.entity'
 export class StageService {
 	constructor(
 		@InjectModel(Stage.name) private readonly stageModel: Model<Stage>,
+		@Inject(forwardRef(() => BoardService))
 		private readonly boardService: BoardService,
 		@Inject(forwardRef(() => TaskService))
 		private readonly taskService: TaskService,
@@ -54,6 +55,28 @@ export class StageService {
 
 	async remove(id: string) {
 		const deleteResult = await this.stageModel.deleteOne({ _id: id })
+
+		return deleteResult
+	}
+
+	async removeMany(ids: string[] | Types.ObjectId[]) {
+		const stages = await this.stageModel.find({ _id: ids })
+
+		for (const stage of stages) {
+			if (stage.tasks.length === 0) {
+				continue
+			}
+
+			const deleteResult = await this.taskService.removeMany(
+				stage.tasks as Types.ObjectId[],
+			)
+
+			if (!deleteResult.deletedCount) {
+				return
+			}
+		}
+
+		const deleteResult = await this.stageModel.deleteMany({ _id: ids })
 
 		return deleteResult
 	}

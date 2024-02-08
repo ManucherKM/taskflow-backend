@@ -9,7 +9,7 @@ import { StageService } from './stage.service'
 @Module({
 	imports: [
 		MongooseModule.forFeature([{ name: Stage.name, schema: StageSchema }]),
-		BoardModule,
+		forwardRef(() => BoardModule),
 		forwardRef(() => TaskModule),
 	],
 	controllers: [StageController],

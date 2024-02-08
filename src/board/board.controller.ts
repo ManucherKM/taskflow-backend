@@ -1,24 +1,32 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
+import { StageService } from '@/stage/stage.service'
 import {
 	BadRequestException,
 	Body,
 	Controller,
 	Delete,
+	forwardRef,
 	Get,
+	Inject,
 	InternalServerErrorException,
 	Param,
 	Patch,
 	Post,
 	UseGuards,
 } from '@nestjs/common'
+import { Types } from 'mongoose'
 import { BoardService } from './board.service'
 import { CreateBoardDto } from './dto/create-board.dto'
 import { UpdateBoardDto } from './dto/update-board.dto'
 
 @Controller('board')
 export class BoardController {
-	constructor(private readonly boardService: BoardService) {}
+	constructor(
+		private readonly boardService: BoardService,
+		@Inject(forwardRef(() => StageService))
+		private readonly stageService: StageService,
+	) {}
 
 	@UseGuards(JwtAuthGuard)
 	@Post()
@@ -146,6 +154,22 @@ export class BoardController {
 	@Delete(':id')
 	async remove(@Param('id') id: string) {
 		try {
+			const foundBoard = await this.boardService.findById(id)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			if (foundBoard.stages.length !== 0) {
+				const stagesDeletedResult = await this.stageService.removeMany(
+					foundBoard.stages as Types.ObjectId[],
+				)
+
+				if (!stagesDeletedResult.deletedCount) {
+					throw new BadRequestException('Failed to delete stages')
+				}
+			}
+
 			const deleteResult = await this.boardService.remove(id)
 
 			return {
