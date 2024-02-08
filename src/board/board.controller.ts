@@ -110,6 +110,34 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@Get('invite/:boardId')
+	async inviteUserToBoard(
+		@GetUserIdByToken() userId: string,
+		@Param('boardId') boardId: string,
+	) {
+		try {
+			const foundBoard = await this.boardService.findById(boardId)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			const savedBoard = await this.boardService.inviteUserToBoard(
+				userId,
+				boardId,
+			)
+
+			if (!savedBoard) {
+				throw new BadRequestException('Failed to join the board.')
+			}
+
+			return savedBoard
+		} catch (e) {
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
 	@Get('all')
 	async findAllByUserId(@GetUserIdByToken() userId: string) {
 		try {

@@ -101,4 +101,26 @@ export class BoardService {
 
 		return removeResult
 	}
+
+	async inviteUserToBoard(userId: string, boardId: string) {
+		const foundBoard = await this.findById(boardId)
+
+		if (!foundBoard) {
+			return
+		}
+
+		if (foundBoard.users.includes(userId)) {
+			return foundBoard
+		}
+
+		foundBoard.users[foundBoard.users.length] = userId
+
+		const savedBoard = await foundBoard.save()
+
+		if (!savedBoard) {
+			return
+		}
+
+		return savedBoard
+	}
 }
