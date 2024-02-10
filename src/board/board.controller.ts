@@ -98,8 +98,8 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Post(':id')
-	async findDeepById(@Body() { id }: { id: string }) {
+	@Get('deep/:id')
+	async findDeepById(@Param('id') id: string) {
 		try {
 			const foundBoard = await this.boardService.findDeepById(id)
 
