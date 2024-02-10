@@ -31,7 +31,7 @@ export class JwtService {
 		return foundToken
 	}
 
-	getAccessToken(payload: IDataToken) {
+	getAccessToken(payload: IDataToken): string {
 		const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
 			expiresIn: 30 * 60, // 30m
 		})
