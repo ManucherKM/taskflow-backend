@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Exclude, Transform } from 'class-transformer'
 import { HydratedDocument, SchemaTypes, Types } from 'mongoose'
 
 export type FileDocument = HydratedDocument<File>
@@ -7,8 +8,10 @@ export type FileDocument = HydratedDocument<File>
 	timestamps: true,
 })
 export class File {
+	@Transform(({ obj }) => obj._id.toString())
 	_id: Types.ObjectId
 
+	@Transform(({ obj }) => obj._id.toString())
 	@Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'User' })
 	userId: Types.ObjectId
 
@@ -24,10 +27,13 @@ export class File {
 	@Prop({ required: true, type: String })
 	mimetype: string
 
+	@Exclude()
 	updatedAt: Date
 
+	@Exclude()
 	createdAt: Date
 
+	@Exclude()
 	__v: number
 }
 

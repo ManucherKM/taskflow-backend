@@ -1,3 +1,4 @@
+import { UserService } from '@/user/user.service'
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
@@ -9,6 +10,7 @@ import { Board } from './entities/board.entity'
 export class BoardService {
 	constructor(
 		@InjectModel(Board.name) private readonly boardModel: Model<Board>,
+		private readonly userService: UserService,
 	) {}
 
 	async create(userId: string, createBoardDto: CreateBoardDto) {
@@ -67,6 +69,18 @@ export class BoardService {
 		return foundBoards
 	}
 
+	async findAllBoardUsers(boardId: string) {
+		const foundBoard = await this.findById(boardId)
+
+		if (!foundBoard) {
+			return
+		}
+
+		const foundUsers = await this.userService.findManyById(foundBoard.users)
+
+		return foundUsers
+	}
+
 	async update(id: string, updateBoardDto: UpdateBoardDto) {
 		const updateResult = await this.boardModel.updateOne(
 			{ _id: id },
@@ -90,6 +104,42 @@ export class BoardService {
 		}
 
 		foundBoard.users.splice(foundIdx, 1)
+
+		const savedBoard = await foundBoard.save()
+
+		return savedBoard
+	}
+
+	async removeAdminFromBoard(
+		boardId: string | Types.ObjectId,
+		userId: string | Types.ObjectId,
+	) {
+		const foundBoard = await this.findById(boardId)
+
+		if (!foundBoard) {
+			return
+		}
+
+		const foundIdx = foundBoard.admins.indexOf(userId as Types.ObjectId)
+
+		foundBoard.admins.splice(foundIdx, 1)
+
+		const savedBoard = await foundBoard.save()
+
+		return savedBoard
+	}
+
+	async addAdminToBoard(
+		boardId: string | Types.ObjectId,
+		userId: string | Types.ObjectId,
+	) {
+		const foundBoard = await this.findById(boardId)
+
+		if (!foundBoard) {
+			return
+		}
+
+		foundBoard.admins[foundBoard.admins.length] = userId as Types.ObjectId
 
 		const savedBoard = await foundBoard.save()
 

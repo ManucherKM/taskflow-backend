@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Exclude } from 'class-transformer'
+import { Exclude, Transform } from 'class-transformer'
 import { HydratedDocument, Types } from 'mongoose'
 
 export type UserDocument = HydratedDocument<User>
@@ -8,6 +8,7 @@ export type UserDocument = HydratedDocument<User>
 	timestamps: true,
 })
 export class User {
+	@Transform(({ obj }) => obj._id.toString())
 	_id: Types.ObjectId
 
 	@Prop({ required: true, unique: true, type: String })
@@ -16,8 +17,8 @@ export class User {
 	@Prop({ required: true, unique: true, type: String })
 	userName: string
 
-	@Prop({ required: true, type: String })
 	@Exclude()
+	@Prop({ required: true, type: String })
 	password: string
 
 	@Prop({ type: String })
@@ -35,12 +36,12 @@ export class User {
 	@Prop({ type: [{ value: String }] })
 	urls?: { value: string }[]
 
-	@Prop({ default: false, type: Boolean })
 	@Exclude()
+	@Prop({ default: false, type: Boolean })
 	isActivated: boolean
 
-	@Prop({ required: true, unique: true, type: String })
 	@Exclude()
+	@Prop({ required: true, unique: true, type: String })
 	activationKey: string
 
 	@Exclude()
@@ -51,6 +52,40 @@ export class User {
 
 	@Exclude()
 	__v: number
+
+	constructor(defaultValues?: {
+		_id: Types.ObjectId
+		email: string
+		userName: string
+		password: string
+		firstName?: string
+		lastName?: string
+		bio?: string
+		birthday?: string
+		urls?: { value: string }[]
+		isActivated: boolean
+		activationKey: string
+		updatedAt: Date
+		createdAt: Date
+		__v: number
+	}) {
+		if (defaultValues) {
+			this._id = defaultValues._id
+			this.email = defaultValues.email
+			this.userName = defaultValues.userName
+			this.password = defaultValues.password
+			this.firstName = defaultValues.firstName
+			this.lastName = defaultValues.lastName
+			this.bio = defaultValues.bio
+			this.birthday = defaultValues.birthday
+			this.urls = defaultValues.urls
+			this.isActivated = defaultValues.isActivated
+			this.activationKey = defaultValues.activationKey
+			this.updatedAt = defaultValues.updatedAt
+			this.createdAt = defaultValues.createdAt
+			this.__v = defaultValues.__v
+		}
+	}
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

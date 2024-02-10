@@ -1,11 +1,15 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
+import SerializerInterceptor from '@/interceptors/Serializer.interceptor'
 import { StageService } from '@/stage/stage.service'
+import { User } from '@/user/entities/user.entity'
+import { UserService } from '@/user/user.service'
 import {
 	BadRequestException,
 	Body,
 	Controller,
 	Delete,
+	ForbiddenException,
 	forwardRef,
 	Get,
 	Inject,
@@ -14,11 +18,13 @@ import {
 	Patch,
 	Post,
 	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common'
 import { Types } from 'mongoose'
 import { BoardService } from './board.service'
 import { CreateBoardDto } from './dto/create-board.dto'
 import { UpdateBoardDto } from './dto/update-board.dto'
+import { Board } from './entities/board.entity'
 
 @Controller('board')
 export class BoardController {
@@ -26,9 +32,11 @@ export class BoardController {
 		private readonly boardService: BoardService,
 		@Inject(forwardRef(() => StageService))
 		private readonly stageService: StageService,
+		private readonly userService: UserService,
 	) {}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Board))
 	@Post()
 	async create(
 		@GetUserIdByToken() userId: string,
@@ -51,6 +59,7 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Board))
 	@Post('name')
 	async findByName(
 		@GetUserIdByToken() userId: string,
@@ -73,6 +82,7 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Board))
 	@Post('leave')
 	async leave(
 		@GetUserIdByToken() userId: string,
@@ -98,6 +108,7 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Board))
 	@Get('deep/:id')
 	async findDeepById(@Param('id') id: string) {
 		try {
@@ -110,6 +121,7 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Board))
 	@Get('invite/:boardId')
 	async inviteUserToBoard(
 		@GetUserIdByToken() userId: string,
@@ -138,6 +150,106 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Board))
+	@Post('admin/remove/:boardId')
+	async removeAdminFromBoard(
+		@GetUserIdByToken() userId: string,
+		@Param('boardId') boardId: string,
+		@Body() removeAdminFromBoardDto: { removeId: string },
+	) {
+		try {
+			const foundBoard = await this.boardService.findById(boardId)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			const foundUser = await this.userService.findById(userId)
+
+			if (!foundUser) {
+				throw new BadRequestException('User not found')
+			}
+
+			if (!foundBoard.admins.includes(foundUser._id)) {
+				throw new ForbiddenException('Access closed')
+			}
+
+			const savedBoard = await this.boardService.removeAdminFromBoard(
+				boardId,
+				removeAdminFromBoardDto.removeId,
+			)
+
+			if (!savedBoard) {
+				throw new BadRequestException('Failed to remove admin.')
+			}
+
+			return savedBoard
+		} catch (e) {
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Board))
+	@Post('admin/add/:boardId')
+	async addAdminToBoard(
+		@GetUserIdByToken() userId: string,
+		@Param('boardId') boardId: string,
+		@Body() removeAdminFromBoardDto: { addId: string },
+	) {
+		try {
+			const foundBoard = await this.boardService.findById(boardId)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			const foundUser = await this.userService.findById(userId)
+
+			if (!foundUser) {
+				throw new BadRequestException('User not found')
+			}
+
+			if (!foundBoard.admins.includes(foundUser._id)) {
+				throw new ForbiddenException('Access closed')
+			}
+
+			const savedBoard = await this.boardService.addAdminToBoard(
+				boardId,
+				removeAdminFromBoardDto.addId,
+			)
+
+			if (!savedBoard) {
+				throw new BadRequestException('Failed to add admin.')
+			}
+
+			return savedBoard
+		} catch (e) {
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(User))
+	@Get('users/:boardId')
+	async findAllBoardUsers(@Param('boardId') boardId: string) {
+		try {
+			const foundBoard = await this.boardService.findById(boardId)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			const foundUsers = await this.boardService.findAllBoardUsers(boardId)
+
+			return foundUsers
+		} catch (e) {
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Board))
 	@Get('all')
 	async findAllByUserId(@GetUserIdByToken() userId: string) {
 		try {
@@ -154,6 +266,7 @@ export class BoardController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Board))
 	@Patch(':id')
 	async update(
 		@Param('id') id: string,

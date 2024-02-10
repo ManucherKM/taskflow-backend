@@ -1,5 +1,6 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
+import SerializerInterceptor from '@/interceptors/Serializer.interceptor'
 import {
 	BadRequestException,
 	Controller,
@@ -10,6 +11,7 @@ import {
 	UseInterceptors,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
+import { File } from './entities/file.entity'
 import { FileService } from './file.service'
 import { fileStorage } from './storage'
 
@@ -18,6 +20,7 @@ export class FileController {
 	constructor(private readonly fileService: FileService) {}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(File))
 	@UseInterceptors(
 		FileInterceptor('file', {
 			storage: fileStorage,

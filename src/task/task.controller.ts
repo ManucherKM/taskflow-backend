@@ -1,4 +1,5 @@
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
+import SerializerInterceptor from '@/interceptors/Serializer.interceptor'
 import { StageService } from '@/stage/stage.service'
 import {
 	BadRequestException,
@@ -12,9 +13,11 @@ import {
 	Patch,
 	Post,
 	UseGuards,
+	UseInterceptors,
 } from '@nestjs/common'
 import { CreateTaskDto } from './dto/create-task.dto'
 import { UpdateTaskDto } from './dto/update-task.dto'
+import { Task } from './entities/task.entity'
 import { TaskService } from './task.service'
 
 @Controller('task')
@@ -26,6 +29,7 @@ export class TaskController {
 	) {}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Task))
 	@Post()
 	async create(@Body() createTaskDto: CreateTaskDto) {
 		try {
@@ -52,6 +56,7 @@ export class TaskController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Task))
 	@Patch(':id')
 	async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
 		try {
@@ -74,6 +79,7 @@ export class TaskController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(SerializerInterceptor(Task))
 	@Post('/duplicate')
 	async duplicate(@Body() duplicateTaskDto: { id: string }) {
 		try {
