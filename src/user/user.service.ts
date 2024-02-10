@@ -56,6 +56,12 @@ export class UserService {
 		return foundUser
 	}
 
+	async findManyById(ids: string[] | Types.ObjectId[]) {
+		const foundUsers = await this.userModel.find({ _id: ids })
+
+		return foundUsers
+	}
+
 	async findByUserName(userName: string) {
 		const foundUser = await this.userModel.findOne({ userName })
 

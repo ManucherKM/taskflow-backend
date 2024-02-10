@@ -20,7 +20,7 @@ export class Board {
 	stages: StageDocument[] | Types.ObjectId[]
 
 	@Prop({ required: true, type: [{ type: SchemaTypes.ObjectId, ref: 'User' }] })
-	admins: string[]
+	admins: Types.ObjectId[]
 
 	@Prop({ required: true, type: [{ type: SchemaTypes.ObjectId, ref: 'User' }] })
 	users: string[]

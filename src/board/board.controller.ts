@@ -1,11 +1,13 @@
 import { GetUserIdByToken } from '@/decorators/GetUserIdByToken'
 import { JwtAuthGuard } from '@/guard/jwt-auth.guard'
 import { StageService } from '@/stage/stage.service'
+import { UserService } from '@/user/user.service'
 import {
 	BadRequestException,
 	Body,
 	Controller,
 	Delete,
+	ForbiddenException,
 	forwardRef,
 	Get,
 	Inject,
@@ -26,6 +28,7 @@ export class BoardController {
 		private readonly boardService: BoardService,
 		@Inject(forwardRef(() => StageService))
 		private readonly stageService: StageService,
+		private readonly userService: UserService,
 	) {}
 
 	@UseGuards(JwtAuthGuard)
@@ -132,6 +135,102 @@ export class BoardController {
 			}
 
 			return savedBoard
+		} catch (e) {
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Post('admin/remove/:boardId')
+	async removeAdminFromBoard(
+		@GetUserIdByToken() userId: string,
+		@Param('boardId') boardId: string,
+		@Body() removeAdminFromBoardDto: { removeId: string },
+	) {
+		try {
+			const foundBoard = await this.boardService.findById(boardId)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			const foundUser = await this.userService.findById(userId)
+
+			if (!foundUser) {
+				throw new BadRequestException('User not found')
+			}
+
+			if (!foundBoard.admins.includes(foundUser._id)) {
+				throw new ForbiddenException('Access closed')
+			}
+
+			const savedBoard = await this.boardService.removeAdminFromBoard(
+				boardId,
+				removeAdminFromBoardDto.removeId,
+			)
+
+			if (!savedBoard) {
+				throw new BadRequestException('Failed to remove admin.')
+			}
+
+			return savedBoard
+		} catch (e) {
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Post('admin/add/:boardId')
+	async addAdminToBoard(
+		@GetUserIdByToken() userId: string,
+		@Param('boardId') boardId: string,
+		@Body() removeAdminFromBoardDto: { addId: string },
+	) {
+		try {
+			const foundBoard = await this.boardService.findById(boardId)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			const foundUser = await this.userService.findById(userId)
+
+			if (!foundUser) {
+				throw new BadRequestException('User not found')
+			}
+
+			if (!foundBoard.admins.includes(foundUser._id)) {
+				throw new ForbiddenException('Access closed')
+			}
+
+			const savedBoard = await this.boardService.addAdminToBoard(
+				boardId,
+				removeAdminFromBoardDto.addId,
+			)
+
+			if (!savedBoard) {
+				throw new BadRequestException('Failed to add admin.')
+			}
+
+			return savedBoard
+		} catch (e) {
+			throw new InternalServerErrorException({ message: e.message })
+		}
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('users/:boardId')
+	async findAllBoardUsers(@Param('boardId') boardId: string) {
+		try {
+			const foundBoard = await this.boardService.findById(boardId)
+
+			if (!foundBoard) {
+				throw new BadRequestException('Board not found')
+			}
+
+			const foundUsers = await this.boardService.findAllBoardUsers(boardId)
+
+			return foundUsers
 		} catch (e) {
 			throw new InternalServerErrorException({ message: e.message })
 		}
