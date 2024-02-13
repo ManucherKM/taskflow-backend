@@ -15,21 +15,15 @@ export class Stage {
 	@Prop({ required: true, type: String })
 	name: string
 
-	@Transform(({ obj, key }) => {
-		if (!obj[key]) return
-
-		return obj[key].map(item => {
-			if (!item) return
-
-			if (item instanceof Types.ObjectId) {
+	@Transform(({ obj, key }) =>
+		obj[key].map(item => {
+			if (Types.ObjectId.isValid(item)) {
 				return item.toString()
 			}
 
-			if (item?._id instanceof Types.ObjectId) {
-				return new Task(item)
-			}
-		})
-	})
+			return new Task(item)
+		}),
+	)
 	@Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Task' }], default: [] })
 	tasks: TaskDocument[] | Types.ObjectId[]
 

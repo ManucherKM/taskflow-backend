@@ -120,7 +120,9 @@ export class BoardService {
 			return
 		}
 
-		const foundIdx = foundBoard.admins.indexOf(userId as Types.ObjectId)
+		const foundIdx = foundBoard.admins.indexOf(
+			userId as unknown as Types.ObjectId,
+		)
 
 		foundBoard.admins.splice(foundIdx, 1)
 
@@ -159,7 +161,7 @@ export class BoardService {
 			return
 		}
 
-		if (foundBoard.users.includes(userId)) {
+		if (foundBoard.users.includes(userId as unknown as string)) {
 			return foundBoard
 		}
 

@@ -21,15 +21,11 @@ export class Board {
 
 	@Transform(({ obj, key }) =>
 		obj[key].map(item => {
-			if (!item) return
-
-			if (item?._id instanceof Types.ObjectId) {
-				return new Stage(item)
-			}
-
-			if (item instanceof Types.ObjectId) {
+			if (Types.ObjectId.isValid(item)) {
 				return item.toString()
 			}
+
+			return new Stage(item)
 		}),
 	)
 	@Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Stage' }], default: [] })
@@ -37,15 +33,11 @@ export class Board {
 
 	@Transform(({ obj, key }) =>
 		obj[key].map(item => {
-			if (!item) return
-
-			if (item?._id instanceof Types.ObjectId) {
-				return new User(item)
-			}
-
-			if (item instanceof Types.ObjectId) {
+			if (Types.ObjectId.isValid(item)) {
 				return item.toString()
 			}
+
+			return new User(item)
 		}),
 	)
 	@Prop({ required: true, type: [{ type: SchemaTypes.ObjectId, ref: 'User' }] })
@@ -53,15 +45,11 @@ export class Board {
 
 	@Transform(({ obj, key }) =>
 		obj[key].map(item => {
-			if (!item) return
-
-			if (item?._id instanceof Types.ObjectId) {
-				return new User(item)
-			}
-
-			if (item instanceof Types.ObjectId) {
+			if (Types.ObjectId.isValid(item)) {
 				return item.toString()
 			}
+
+			return new User(item)
 		}),
 	)
 	@Prop({ required: true, type: [{ type: SchemaTypes.ObjectId, ref: 'User' }] })
