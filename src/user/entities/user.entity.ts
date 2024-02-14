@@ -33,6 +33,12 @@ export class User {
 	@Prop({ type: String })
 	birthday?: string
 
+	@Transform(({ obj, key }) =>
+		obj[key].map(item => {
+			const { _id, ...other } = item
+			return other
+		}),
+	)
 	@Prop({ type: [{ value: String }] })
 	urls?: { value: string }[]
 
